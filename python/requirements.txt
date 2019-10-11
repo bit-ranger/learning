@@ -1,0 +1,2 @@
+celery[redis]==4.3.0
+eventlet==0.25.0
