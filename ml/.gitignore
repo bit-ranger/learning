@@ -1,0 +1,8 @@
+.ipynb_checkpoints
+datasets/
+.idea
+*.pyproj
+*.sln
+venv/
+.vs
+learning-ml.iml

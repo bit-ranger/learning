@@ -1,0 +1,34 @@
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+    <script type="text/javascript" src="js/util.js"></script>
+    <script>
+
+        var fmt = $$.newDateFormat("YYYY-MM-DD hh:mm:ss");
+        var timeString = fmt.format(new Date);
+        var timeDate = fmt.parse(timeString);
+        alert(timeString);
+        alert(timeDate);
+
+
+
+        var list = {a:1,b:2,c:3};
+        alert($$.reduce(list, function (p,n){
+            return p+n;
+        }));
+
+
+        try{
+            $$.assert($$.notEmpty(), "断言失败")
+        } catch (error){
+            alert(error.message);
+        }
+
+
+    </script>
+</head>
+<body>
+
+</body>
+</html>

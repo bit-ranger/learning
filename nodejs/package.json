@@ -1,0 +1,20 @@
+{
+  "name": "learning-nodejs",
+  "version": "1.0.0",
+  "description": "Learning Nodejs",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dubuyuye/learning-nodejs"
+  },
+  "dependencies": {
+    "mongodb": "~2.0",
+	"formidable": "1.0.17"
+  },
+  "author": "dubuyuye",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dubuyuye/learning-nodejs/issues"
+  },
+  "homepage": "https://github.com/dubuyuye/learning-nodejs"
+}

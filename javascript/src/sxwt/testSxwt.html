@@ -1,0 +1,48 @@
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+
+
+<script type="text/javascript" src="sxwt.js" id="c"></script>
+<script type="text/javascript">
+    function afterLoad(){
+
+
+        $.loadImg('http://image.beekka.com/blog/201106/bg2011060501.jpg',function (img){
+            document.getElementsByTagName('body')[0].appendChild(img);
+        });
+        $.loadCss('testSxwt.css',function(css){
+            alert('css-href:'+ css.href);
+        });
+        $.loadJs('testSxwt.js',function(js){
+            alert('js-src'+ js.src + 'var test = ' + test);
+        });
+        $.jsonp({
+           url: 'http://localhost:8080/wt',
+           data : {a:'1',b:'2'},
+           callback : function(msg){
+                alert(msg);
+           }
+        });
+        $.ajax({
+            type:'post',
+            url:'http://localhost:8080/wt',
+            data:{
+                p1:'李',
+                p2:'王'
+            },
+            success:function(msg,status){
+                alert(msg.toString()+status);
+            }
+        });
+    }
+
+    document.onload = afterLoad();
+    window;
+
+</script>
+</body>
+</html>

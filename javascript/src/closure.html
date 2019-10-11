@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript">
+        function clickCall(j){
+            //直接返回不行，因为如果提供了参数，该方法将被直接执行，调用者得到的只是此方法的执行结果，而非方法本身
+            //return alert('您单击的是第' + i + '个链接');
+            return function(){
+                alert('您单击的是第' + j + '个链接');
+            }
+        }
+
+        function badClosureExample(){
+            for (var i = 1; i <4; i++) {
+                var element = document.getElementById('closureTest' + i);
+//                element.onclick = function(){
+//                    //闭包，内部的方法被其他对象引用，如果内部的方法使用了外部方法的变量，将造成外部方法无法释放，变量将被保持
+//                    // 该方法在触发click后才会执行，此时才会去初始化i的值,而i早已因闭包而保持为4
+//                    //解决问题的思路为让i不再闭包
+					  //方法2：由自执行匿名函数直接返回一个回调方法
+//                    alert('您单击的是第' + i + '个链接');
+//                }
+                //方法后面加括号表示调用，调用后将获得方法的执行结果；要获取方法本身，只能使用方法名放弃参数
+                //在被调用方法内部使用闭包将一举两得，被调用的方法返回真正需要的方法体，需要的方法体参数由包装方法闭包保持
+                element.onclick =  clickCall(i);
+            }
+        }
+
+        function bind(){
+            var element = document.getElementById('closureTest0');
+            element.onclick = function(){
+                setTimeout(function(p){
+                    return function(){
+                        alert(p);
+                    }
+                }('998'), 1000); //延迟1秒弹出提示
+            }
+        }
+
+        window.onload=function(){
+            badClosureExample();
+            bind();
+        }
+    </script>
+    <title>闭包</title>
+</head>
+<body>
+
+<a href="#" id="closureTest0">利用闭包的例子（1秒后会看到提示）</a><br />
+<a href="#" id="closureTest1">由于闭包导致问题的例子1</a><br />
+<a href="#" id="closureTest2">由于闭包导致问题的例子2</a><br />
+<a href="#" id="closureTest3">由于闭包导致问题的例子3</a><br />
+
+<a href="#" onclick="alert('test');">test</a>
+</body>
+</html>

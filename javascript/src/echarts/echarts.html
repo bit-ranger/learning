@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+
+<body>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<div id="main" style="height:400px"></div>
+
+<script src="file:///E:/桌面/echarts-2.1.10(1)/echarts-2.1.10/build/dist/echarts.js"></script>
+<script type="text/javascript">
+    // 路径配置
+    require.config({
+        paths: {
+            echarts: 'file:///E:/桌面/echarts-2.1.10(1)/echarts-2.1.10/build/dist'
+        }
+    });
+
+    // 使用
+    require(
+        [
+            'echarts',
+            'echarts/chart/map' // 使用柱状图就加载bar模块，按需加载
+        ],
+        function (ec) {
+            // 基于准备好的dom，初始化echarts图表
+            var myChart = ec.init(document.getElementById('main'));
+
+            var option = {
+                dataRange: {
+                    min: 0,
+                    max: 10,
+                    color:['red','yellow'],
+                    calculable : true
+                },
+                series : [
+                    {
+                        name:"销量",
+                        type:"map",
+                        mapType:"china",
+                        itemStyle:{
+                            normal:{label:{show:true}},
+                            emphasis:{label:{show:true}}
+                        },
+                        data:[{name:'江苏',value:1}, {name:'浙江',value:3},{name:'山东',value:7}, {name:'安徽',value:9}, {name:'江西',value:10}]
+                    }
+                ]
+            };
+
+            // 为echarts对象加载数据
+            myChart.setOption(option);
+        }
+    );
+</script>
+</body>
