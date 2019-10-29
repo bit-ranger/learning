@@ -4,5 +4,6 @@ members = [
 'ownership',
 'module',
 'collection',
-'error'
+'error',
+'generic'
 ]
