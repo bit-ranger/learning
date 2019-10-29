@@ -1,4 +1,3 @@
-
 fn first_word(s: &str) -> &str {
     let bytes = s.as_bytes();
 
@@ -10,7 +9,6 @@ fn first_word(s: &str) -> &str {
 
     &s[..]
 }
-
 
 fn main() {
     let my_string = String::from("hello world");
