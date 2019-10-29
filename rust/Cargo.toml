@@ -1,2 +1,2 @@
 [workspace]
-members = ['guess', 'ownership']
+members = ['guess', 'ownership', 'module']
