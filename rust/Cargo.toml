@@ -1,2 +1,8 @@
 [workspace]
-members = ['guess', 'ownership', 'module', 'collection']
+members = [
+'guess',
+'ownership',
+'module',
+'collection',
+'error'
+]
