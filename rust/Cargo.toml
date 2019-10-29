@@ -6,7 +6,8 @@ members = [
 'collection',
 'error',
 'generic',
-'traits'
+'traits',
+'lifetime'
 ]
 
 [profile.release]
