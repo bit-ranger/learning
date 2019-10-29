@@ -5,5 +5,9 @@ members = [
 'module',
 'collection',
 'error',
-'generic'
+'generic',
+'traits'
 ]
+
+[profile.release]
+panic = 'abort'
