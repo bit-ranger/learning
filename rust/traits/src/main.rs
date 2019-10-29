@@ -113,10 +113,22 @@ impl<T: Display + PartialOrd> Pair<T> {
     }
 }
 
-impl<T: Display> ToString for T {
-    fn to_string(&self) -> String {
-        unimplemented!()
+//impl<T: Display> ToString for T {
+//    fn to_string(&self) -> String {
+//        unimplemented!()
+//    }
+//}
+
+fn max<T: PartialOrd>(list: &Vec<T>) -> &T {
+    let mut largest = list.get(0).unwrap();
+
+    for item in list.iter() {
+        if &item > &largest {
+            largest = item;
+        }
     }
+
+    largest
 }
 
 fn main() {
@@ -130,7 +142,10 @@ fn main() {
 
     notify(article);
 
-    let char_list = vec!['y', 'm', 'a', 'q'];
+    let char_list = vec!['y', 'm', 'a', 'q', 'z'];
     let result = largest(&char_list);
     println!("The largest char is {}", result);
+
+    let result = max(&char_list);
+    println!("the max is {}", result);
 }
