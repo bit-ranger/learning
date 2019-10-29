@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+    <bean id="centitPowerFilter" class="org.frost.beans.DaoFilterSecurityInterceptor">
+        <property name="accessDecisionManager" ref="centitAccessDecisionManagerBean" />
+        <property name="securityMetadataSource" ref="centitSecurityMetadataSource" />
+    </bean>
+
+    <!-- 访问决策器，决定某个用户具有的角色，是否有足够的权限去访问某个资源 -->
+    <bean id="centitAccessDecisionManagerBean"
+          class="org.frost.beans.DaoAccessDecisionManager">
+        <property name="name" value="abc"/>
+    </bean>
+
+    <!-- 资源源数据定义，即定义某一资源可以被哪些角色访问 -->
+    <bean id="centitSecurityMetadataSource"
+          class="org.frost.beans.DaoInvocationSecurityMetadataSource" >
+    </bean>
+</beans>
