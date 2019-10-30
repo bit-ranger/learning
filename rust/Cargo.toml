@@ -8,7 +8,8 @@ members = [
 'generic',
 'traits',
 'lifetime',
-'test_demo'
+'test_demo',
+'grep'
 ]
 
 [profile.release]
