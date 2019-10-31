@@ -96,7 +96,9 @@ mod test2 {
         let b = Cons(Rc::new(RefCell::new(6)), Rc::clone(&a));
         let c = Cons(Rc::new(RefCell::new(10)), Rc::clone(&a));
 
+        *(value.borrow_mut()) += 10;
         *value.borrow_mut() += 10;
+        *((&value).borrow_mut()) += 10;
 
         println!("a after = {:?}", a);
         println!("b after = {:?}", b);

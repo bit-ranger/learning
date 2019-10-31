@@ -70,6 +70,7 @@ mod tests {
             let m = MyBox::new(String::from("Rust"));
             // 解引用强制多态
             hello(&(*m)[..]);
+            hello(&(m.deref())[..]);
             hello(&m);
             m.look();
             //            m.look(); 上一个m.look已move ownership

@@ -30,7 +30,8 @@ mod tests {
             println!("count after creating c = {}", Rc::strong_count(&a));
         }
         println!("count after c goes out of scope = {}", Rc::strong_count(&a));
-
-        println!("{}", a.value())
+        println!("{}", a.deref().value());
+        println!("{}", a.value());
+        println!("{}", (*a).value());
     }
 }
