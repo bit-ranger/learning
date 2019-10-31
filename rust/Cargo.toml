@@ -17,7 +17,8 @@ members = [
 'boxdemo',
 'deref',
 'drop',
-'rc'
+'rc',
+'refcell'
 ]
 
 
