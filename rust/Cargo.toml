@@ -10,7 +10,8 @@ members = [
 'lifetime',
 'test_demo',
 'grep',
-'closure'
+'closure',
+'iterator'
 ]
 
 [profile.release]
