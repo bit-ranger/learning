@@ -15,7 +15,8 @@ members = [
 'cargo',
 'cargo2',
 'boxdemo',
-'deref'
+'deref',
+'drop'
 ]
 
 
