@@ -97,7 +97,9 @@ mod test2 {
         let c = Cons(Rc::new(RefCell::new(10)), Rc::clone(&a));
 
         *(value.borrow_mut()) += 10;
+        //手动解引用
         *value.borrow_mut() += 10;
+        //手动解引用
         *((&value).borrow_mut()) += 10;
 
         println!("a after = {:?}", a);
