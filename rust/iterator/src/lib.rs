@@ -1,6 +1,5 @@
 use counter::Counter;
 
-mod audio;
 mod counter;
 
 #[test]
