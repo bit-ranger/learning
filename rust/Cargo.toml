@@ -14,7 +14,8 @@ members = [
 'iterator',
 'cargo',
 'cargo2',
-'boxdemo'
+'boxdemo',
+'deref'
 ]
 
 
