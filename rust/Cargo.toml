@@ -13,8 +13,13 @@ members = [
 'closure',
 'iterator',
 'cargo',
-'cargo2'
+'cargo2',
+'boxdemo'
 ]
+
+
+[profile.dev]
+opt-level = 0
 
 [profile.release]
 panic = 'abort'
