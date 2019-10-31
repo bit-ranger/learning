@@ -11,8 +11,11 @@ members = [
 'test_demo',
 'grep',
 'closure',
-'iterator'
+'iterator',
+'cargo',
+'cargo2'
 ]
 
 [profile.release]
 panic = 'abort'
+

@@ -52,7 +52,7 @@ fn search<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
     contents
         .lines()
         .filter(|line| line.contains(query))
-        .collec()
+        .collect()
 }
 
 fn search_case_insensitive<'a>(query: &str, contents: &'a str) -> Vec<&'a str> {
