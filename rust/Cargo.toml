@@ -23,7 +23,8 @@ members = [
 'concurrency',
 'gui',
 'blog',
-'blog2'
+'blog2',
+'pattern'
 ]
 
 
