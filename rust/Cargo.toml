@@ -18,7 +18,8 @@ members = [
 'deref',
 'drop',
 'rc',
-'refcell'
+'refcell',
+'refcycle'
 ]
 
 
