@@ -20,7 +20,8 @@ members = [
 'rc',
 'refcell',
 'refcycle',
-'concurrency'
+'concurrency',
+'gui'
 ]
 
 
