@@ -22,7 +22,8 @@ members = [
 'refcycle',
 'concurrency',
 'gui',
-'blog'
+'blog',
+'blog2'
 ]
 
 
