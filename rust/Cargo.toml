@@ -19,7 +19,8 @@ members = [
 'drop',
 'rc',
 'refcell',
-'refcycle'
+'refcycle',
+'concurrency'
 ]
 
 
