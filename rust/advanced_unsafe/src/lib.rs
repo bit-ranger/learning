@@ -1,3 +1,4 @@
+mod function;
 mod pointer;
 
 #[cfg(test)]
