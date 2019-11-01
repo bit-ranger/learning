@@ -2,6 +2,13 @@ use std::fmt::Display;
 
 use summary::Summary;
 
+mod add_overload;
+mod advanced;
+mod associate;
+mod bound;
+mod newtype;
+mod samename;
+
 mod summary;
 
 struct NewsArticle {
