@@ -24,7 +24,8 @@ members = [
 'gui',
 'blog',
 'blog2',
-'pattern'
+'pattern',
+'advanced_unsafe'
 ]
 
 
