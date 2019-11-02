@@ -1,7 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     fn print_coordinates(&(x, y): &(i32, i32)) {
         println!("Current location: ({}, {})", x, y);
     }

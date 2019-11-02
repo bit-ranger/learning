@@ -1,7 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn work() {
         let x = 1;
@@ -18,14 +16,14 @@ mod tests {
             // | 匹配范围
             // 范围只允许用于数字或 char 值，因为编译器会在编译时检查范围不为空
             // char 和 数字值是 Rust 仅有的可以判断范围是否为空的类型。
-            1...5 => println!("one through five"),
+            1..=5 => println!("one through five"),
             _ => println!("something else"),
         }
 
         let x = 'c';
         match x {
-            'a'...'j' => println!("early ASCII letter"),
-            'k'...'z' => println!("late ASCII letter"),
+            'a'..='j' => println!("early ASCII letter"),
+            'k'..='z' => println!("late ASCII letter"),
             _ => println!("something else"),
         }
     }
@@ -71,7 +69,7 @@ mod tests {
     #[test]
     fn work4() {
         //结构结构体和元组
-        let ((feet, inches), Point { x, y }) = ((3, 10), Point { x: 3, y: -10 });
+        let ((_feet, _inches), Point { x: _, y: _ }) = ((3, 10), Point { x: 3, y: -10 });
     }
 
     mod ignore {
@@ -120,7 +118,7 @@ mod tests {
             // 忽略未使用的变量
             // _x 仍会将值绑定到变量，而 _ 则完全不会绑定
             let _x = 5;
-            let y = 10;
+            let _y = 10;
         }
 
         #[test]
@@ -256,10 +254,10 @@ mod tests {
             match msg {
                 // 匹配后绑定到id_variable
                 Message::Hello {
-                    id: id_variable @ 3...7,
+                    id: id_variable @ 3..=7,
                 } => println!("Found an id in range: {}", id_variable),
                 // 使用...后不能绑定到变量, 需要绑定必须@
-                Message::Hello { id: 10...12 } => println!("Found an id in another range"),
+                Message::Hello { id: 10..=12 } => println!("Found an id in another range"),
                 Message::Hello { id } => println!("Found some other id: {}", id),
             }
         }

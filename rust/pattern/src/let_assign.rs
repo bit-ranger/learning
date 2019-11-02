@@ -1,11 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn work() {
-        let x = 5;
+        let _x = 5;
 
-        let (x, y, z) = (1, 2, 3);
+        let (_x, _y, _z) = (1, 2, 3);
     }
 }

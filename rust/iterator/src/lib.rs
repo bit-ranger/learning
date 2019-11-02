@@ -1,4 +1,4 @@
-use crate::counter::Counter;
+use counter::Counter;
 
 mod counter;
 

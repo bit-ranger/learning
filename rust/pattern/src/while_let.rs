@@ -1,7 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn work() {
         let mut stack = Vec::new();
