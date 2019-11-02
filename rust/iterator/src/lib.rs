@@ -1,5 +1,3 @@
-use counter::Counter;
-
 mod counter;
 
 #[test]
@@ -99,6 +97,7 @@ fn filters_by_size() {
 
 #[test]
 fn calling_next_directly() {
+    use counter::Counter;
     let mut counter = Counter::new();
 
     assert_eq!(counter.next(), Some(1));
@@ -111,6 +110,7 @@ fn calling_next_directly() {
 
 #[test]
 fn using_other_iterator_trait_methods() {
+    use counter::Counter;
     let sum: u32 = Counter::new()
         .zip(Counter::new().skip(1))
         .map(|(a, b)| a * b)
