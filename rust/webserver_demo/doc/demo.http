@@ -12,3 +12,7 @@ GET http://localhost:7878
 GET http://localhost:7878/aaa
 
 ###
+
+GET http://localhost:7878/sleep
+
+###

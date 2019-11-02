@@ -1,5 +1,7 @@
 #[cfg(test)]
 mod tests {
+    use std::thread;
+
     fn add_one(x: i32) -> i32 {
         x + 1
     }

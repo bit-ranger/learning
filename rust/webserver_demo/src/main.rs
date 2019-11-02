@@ -1,5 +1,5 @@
-mod single_thread;
+mod concurrency;
 
 fn main() {
-    single_thread::main();
+    concurrency::main();
 }
