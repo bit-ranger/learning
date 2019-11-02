@@ -16,7 +16,7 @@ impl Point<f32> {
 }
 
 pub fn demo() {
-    let integer = Point { x: 5, y: 10 };
+    let _integer = Point { x: 5, y: 10 };
     let float = Point { x: 1.0, y: 4.0 };
 
     println!("p.x = {}", float.x());

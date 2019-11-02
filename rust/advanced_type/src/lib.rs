@@ -13,7 +13,7 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let f: Box<dyn Fn() + Send + 'static> = Box::new(|| println!("hi"));
+        let _f: Box<dyn Fn() + Send + 'static> = Box::new(|| println!("hi"));
     }
 }
 
@@ -32,7 +32,7 @@ mod alais {
 
     #[test]
     fn work() {
-        let f: Thunk = Box::new(|| println!("hi"));
+        let _f: Thunk = Box::new(|| println!("hi"));
     }
 }
 
@@ -57,16 +57,16 @@ mod never {
 
 #[cfg(test)]
 mod dynamic {
-    fn generic<T>(t: T) {
+    fn generic<T>(_t: T) {
         // --snip--
     }
 
-    fn generic2<T: Sized>(t: T) {
+    fn generic2<T: Sized>(_t: T) {
         // --snip--
     }
 
     //泛型函数默认只能用于在编译时已知大小的类型。然而可以使用如下特殊语法来放宽这个限制
-    fn generic3<T: ?Sized>(t: &T) {
+    fn generic3<T: ?Sized>(_t: &T) {
         // --snip--
     }
 

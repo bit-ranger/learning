@@ -1,7 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use std::thread;
-
     fn add_one(x: i32) -> i32 {
         x + 1
     }
@@ -21,13 +19,13 @@ mod tests {
     #[test]
     fn work2() {
         let list_of_numbers = vec![1, 2, 3];
-        let list_of_strings: Vec<String> = list_of_numbers.iter().map(|i| i.to_string()).collect();
+        let _list_of_strings: Vec<String> = list_of_numbers.iter().map(|i| i.to_string()).collect();
     }
 
     #[test]
     fn work3() {
         let list_of_numbers = vec![1, 2, 3];
-        let list_of_strings: Vec<String> =
+        let _list_of_strings: Vec<String> =
             list_of_numbers.iter().map(ToString::to_string).collect();
     }
 

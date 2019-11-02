@@ -27,8 +27,6 @@ impl fmt::Display for Point {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn work() {}
 }

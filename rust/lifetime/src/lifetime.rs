@@ -43,7 +43,7 @@ mod tests {
         fn main() {
             let num = 5;
 
-            let obj = Box::new(Ball { diameter: &num }) as Box<dyn Red>;
+            let _obj = Box::new(Ball { diameter: &num }) as Box<dyn Red>;
         }
     }
 
@@ -81,7 +81,7 @@ mod tests {
 
         // 省略
         impl fmt::Debug for StrWrap<'_> {
-            fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+            fn fmt(&self, _f: &mut Formatter<'_>) -> Result<(), Error> {
                 unimplemented!()
             }
         }

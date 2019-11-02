@@ -30,8 +30,6 @@ fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn work() {}
 }

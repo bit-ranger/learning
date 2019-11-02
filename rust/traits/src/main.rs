@@ -41,11 +41,11 @@ fn notify(item: impl Summary) {
     println!("Breaking news! {}", item.summarize());
 }
 
-fn notify_2(item1: impl Summary, item2: impl Summary) {
+fn notify_2(item1: impl Summary, _item2: impl Summary) {
     println!("notify_2! {}", item1.summarize());
 }
 
-fn notify_3<T: Summary>(item_1: T, item2: T) {
+fn notify_3<T: Summary>(item_1: T, _item2: T) {
     println!("notify_3! {}", item_1.summarize());
 }
 
@@ -57,7 +57,7 @@ fn notify_5<T: Summary + Display>(item: T) {
     println!("notify_5! {}", item.summarize());
 }
 
-fn notify_6<T, U>(t: T, u: U) -> i32
+fn notify_6<T, U>(t: T, _u: U) -> i32
 where
     T: Display + Clone,
     U: Clone + Display,

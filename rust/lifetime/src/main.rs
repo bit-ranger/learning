@@ -62,9 +62,9 @@ where
 fn main() {
     let novel = String::from("Call me Ishmael. Some years ago...");
     let first_sentence = novel.split('.').next().expect("Could not find a '.'");
-    let i = ImportantExcerpt {
+    let _i = ImportantExcerpt {
         part: first_sentence,
     };
 
-    let s: &'static str = "I have a static lifetime.";
+    let _s: &'static str = "I have a static lifetime.";
 }

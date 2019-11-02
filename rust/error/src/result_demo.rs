@@ -5,7 +5,7 @@ use std::io::{self, ErrorKind, Read};
 pub fn demo() {
     let f = File::open("hello.txt");
 
-    let f = match f {
+    let _f = match f {
         Ok(file) => file,
         Err(error) => match error.kind() {
             ErrorKind::NotFound => match File::create("hello.txt") {
@@ -16,9 +16,9 @@ pub fn demo() {
         },
     };
 
-    let f = File::open("hello.txt").unwrap();
+    let _f = File::open("hello.txt").unwrap();
 
-    let f = File::open("hello.txt").expect("Failed to open hello.txt");
+    let _f = File::open("hello.txt").expect("Failed to open hello.txt");
 }
 
 fn read_username_from_file() -> Result<String, io::Error> {
@@ -53,7 +53,7 @@ fn read_username_from_file_3() -> Result<String, io::Error> {
 }
 
 fn read_username_from_file_4() -> Result<(), Box<dyn Error>> {
-    let f = File::open("hello.txt")?;
+    let _f = File::open("hello.txt")?;
 
     Ok(())
 }
