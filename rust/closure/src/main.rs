@@ -1,6 +1,8 @@
 use std::thread;
 use std::time::Duration;
 
+mod advanced;
+
 struct Cacher<T>
 where
     T: Fn(u32) -> u32,
