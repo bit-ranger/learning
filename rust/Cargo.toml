@@ -26,7 +26,10 @@ members = [
 'blog2',
 'pattern',
 'advanced_unsafe',
-'advanced_type'
+'advanced_type',
+'advanced_macro',
+'advanced_macro/advanced_macro_derive',
+'advanced_macro_pancakes'
 ]
 
 
