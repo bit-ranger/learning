@@ -13,7 +13,7 @@ fn main() {
         data: String::from("my stuff"),
     };
     drop(c);
-    let d = CustomSmartPointer {
+    let _d = CustomSmartPointer {
         data: String::from("other stuff"),
     };
     println!("CustomSmartPointers created.");

@@ -1,7 +1,5 @@
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn work() {
         let mut num = 5;
@@ -15,6 +13,6 @@ mod tests {
         }
 
         let address = 0b00011000usize;
-        let r = address as *const i32;
+        let _r = address as *const i32;
     }
 }

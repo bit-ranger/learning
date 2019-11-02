@@ -3,13 +3,13 @@ mod tests {
     //类型别名
     type Kilometers = i32;
 
-    fn takes_long_type(f: Box<dyn Fn() + Send + 'static>) {
-        // --snip--
-    }
-
-    fn returns_long_type() -> Box<dyn Fn() + Send + 'static> {
-        // --snip--
-    }
+    //    fn takes_long_type(f: Box<dyn Fn() + Send + 'static>) {
+    //        // --snip--
+    //    }
+    //
+    //    fn returns_long_type() -> Box<dyn Fn() + Send + 'static> {
+    //        // --snip--
+    //    }
 
     #[test]
     fn it_works() {
@@ -22,13 +22,13 @@ mod alais {
     //类型别名
     type Thunk = Box<dyn Fn() + Send + 'static>;
 
-    fn takes_long_type(f: Thunk) {
-        // --snip--
-    }
-
-    fn returns_long_type() -> Thunk {
-        // --snip--
-    }
+    //    fn takes_long_type(f: Thunk) {
+    //        // --snip--
+    //    }
+    //
+    //    fn returns_long_type() -> Thunk {
+    //        // --snip--
+    //    }
 
     #[test]
     fn work() {
@@ -39,9 +39,9 @@ mod alais {
 #[cfg(test)]
 mod never {
     //发散函数
-    fn bar() -> ! {
-        // --snip--
-    }
+    //    fn bar() -> ! {
+    //        // --snip--
+    //    }
 
     #[test]
     fn work() {

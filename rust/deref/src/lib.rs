@@ -29,7 +29,7 @@ mod tests {
             }
 
             fn look(self) {
-                let value = self.0;
+                let _value = self.0;
                 println!("{}", "look")
             }
         }

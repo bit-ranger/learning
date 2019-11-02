@@ -12,7 +12,7 @@ pub fn demo() {
     let scores: HashMap<_, _> = teams.iter().zip(initial_scores.iter()).collect();
 
     let team_name = String::from("Blue");
-    let score = scores.get(&team_name);
+    let _score = scores.get(&team_name);
 
     for (key, value) in &scores {
         println!("{}: {}", key, value);

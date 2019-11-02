@@ -1,7 +1,5 @@
 extern crate proc_macro;
 
-use proc_macro::TokenStream;
-
 pub trait HelloMacro {
     fn hello_macro();
 }

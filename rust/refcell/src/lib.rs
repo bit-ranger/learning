@@ -57,7 +57,7 @@ mod tests {
 
     impl Messenger for MockMessenger {
         fn send(&self, message: &str) {
-            let mut sm = &self.sent_messages;
+            let sm = &self.sent_messages;
             sm.borrow_mut().push(String::from(message));
         }
     }
@@ -76,7 +76,6 @@ mod tests {
 #[cfg(test)]
 mod test2 {
     use std::cell::RefCell;
-    use std::ops::{Deref, DerefMut};
     use std::rc::Rc;
 
     use List::{Cons, Nil};
