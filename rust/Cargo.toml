@@ -29,7 +29,8 @@ members = [
 'advanced_type',
 'advanced_macro',
 'advanced_macro/advanced_macro_derive',
-'advanced_macro_pancakes'
+'advanced_macro_pancakes',
+'webserver_demo'
 ]
 
 
