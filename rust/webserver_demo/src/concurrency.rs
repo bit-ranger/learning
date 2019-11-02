@@ -10,7 +10,7 @@ pub fn main() {
 
     let pool = ThreadPool::new(4);
 
-    for stream in listener.incoming() {
+    for stream in listener.incoming().take(2) {
         let stream = stream.unwrap();
 
         //此处closure不需要move, 因为handle_connection需要move, 这里可以省略
@@ -18,6 +18,8 @@ pub fn main() {
         pool.execute(|| {
             handle_connection(stream);
         });
+
+        println!("Shutting down.");
     }
 
     fn handle_connection(mut stream: TcpStream) {
