@@ -30,7 +30,9 @@ members = [
 'advanced_macro',
 'advanced_macro/advanced_macro_derive',
 'advanced_macro_pancakes',
-'webserver_demo'
+'webserver_demo',
+'async_demo',
+'tax2019'
 ]
 
 
