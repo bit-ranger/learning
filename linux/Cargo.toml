@@ -1,0 +1,12 @@
+[workspace]
+members = [
+'file'
+]
+
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+panic = 'abort'
+
