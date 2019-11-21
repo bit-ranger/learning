@@ -1,6 +1,7 @@
 [workspace]
 members = [
-'file'
+'file',
+'env'
 ]
 
 
