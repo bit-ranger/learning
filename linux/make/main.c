@@ -7,6 +7,7 @@ extern void function_two();
 extern void function_three();
 
 int main() {
+    printf("aaa\n");
     function_two();
     function_three();
     exit(EXIT_SUCCESS);
