@@ -21,6 +21,7 @@ main.o: main.c a.h
 
 clean:
 	-rm main.o 2.o 3.o $(MYLIB) myapp
+	-rm -rf myapp-1.0
 
 install: myapp
 	@if [ -d $(INSTDIR) ]; \
@@ -31,4 +32,13 @@ install: myapp
 	else \
 		echo "Sorry, $(INSTDIR) does not exist";\
 	fi
+
+
+dist: myapp-1.0.tar.gz
+
+myapp-1.0.tar.gz: myapp myapp.1
+	-rm -rf myapp-1.0
+	mkdir myapp-1.0
+	cp *.c *.h *.1 Makefile myapp-1.0
+	tar zcvf $@ myapp-1.0
 
