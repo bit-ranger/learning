@@ -1,7 +1,8 @@
 [workspace]
 members = [
 'file',
-'env'
+'env',
+'process'
 ]
 
 
