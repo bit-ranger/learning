@@ -26,11 +26,18 @@ int main() {
         perror("Thread creation failed");
         exit(EXIT_FAILURE);
     }
+
     printf("Input some text. Enter 'end' to finish\n");
     while(strncmp("end", work_area, 3) != 0) {
-        fgets(work_area, WORK_SIZE, stdin);
+        if (strncmp(work_area, "FAST", 4) == 0) {
+            sem_post(&bin_sem);
+            strcpy(work_area, "Wheeee...");
+        } else {
+            fgets(work_area, WORK_SIZE, stdin);
+        }
         sem_post(&bin_sem);
     }
+
     printf("\nWaiting for thread to finish...\n");
     res = pthread_join(a_thread, &thread_result);
     if (res != 0) {
