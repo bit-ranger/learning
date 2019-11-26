@@ -12,6 +12,8 @@ CFLAGS = -g -Wall -ansi
 # Local Libraries
 THREAD_LIB = threadlib.a
 
+all: popen pipe pipe4 pipe_stdin fifo_producer fifo_consumer
+
 popen: popen.c
 	$(CC) popen.c -o popen
 
@@ -25,8 +27,11 @@ pipe4: pipe4.c
 pipe_stdin: pipe_stdin.c
 	$(CC) pipe_stdin.c -o pipe_stdin
 
-fifo: fifo.c
-	$(CC) fifo.c -o fifo
+fifo_producer: fifo_producer.c
+	$(CC) fifo_producer.c -o fifo_producer
+
+fifo_consumer: fifo_consumer.c
+	$(CC) fifo_consumer.c -o fifo_consumer
 
 
 
