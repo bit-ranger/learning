@@ -22,5 +22,8 @@ pipe: pipe.c
 pipe4: pipe4.c
 	$(CC) pipe4.c -o pipe4
 
+pipe_stdin: pipe_stdin.c
+	$(CC) pipe_stdin.c -o pipe_stdin
+
 
 
