@@ -15,6 +15,8 @@ THREAD_LIB = threadlib.a
 popen: popen.c
 	$(CC) popen.c -o popen
 
+pipe: pipe.c
+	$(CC) pipe.c -o pipe
 
 
 
