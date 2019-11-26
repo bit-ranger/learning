@@ -30,5 +30,8 @@ attr_sched: attr_sched.c
 cancel: cancel.c
 	$(CC) cancel.c -o cancel -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
 
+multi: multi.c
+	$(CC) multi.c -o multi -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
+
 
 
