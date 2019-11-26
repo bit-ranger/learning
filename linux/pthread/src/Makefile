@@ -18,5 +18,8 @@ create_and_join: create_and_join.c
 semaphore: semaphore.c
 	$(CC) semaphore.c -o semaphore -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
 
+mutex: mutex.c
+	$(CC) mutex.c -o mutex -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
+
 
 
