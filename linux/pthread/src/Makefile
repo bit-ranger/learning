@@ -27,5 +27,8 @@ attr_detached: attr_detached.c
 attr_sched: attr_sched.c
 	$(CC) attr_sched.c -o attr_sched -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
 
+cancel: cancel.c
+	$(CC) cancel.c -o cancel -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
+
 
 
