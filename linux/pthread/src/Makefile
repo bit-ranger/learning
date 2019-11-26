@@ -21,5 +21,8 @@ semaphore: semaphore.c
 mutex: mutex.c
 	$(CC) mutex.c -o mutex -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
 
+attr_detached: attr_detached.c
+	$(CC) attr_detached.c -o attr_detached -D_REENTRANT -I/usr/include/nptl -L/usr/lib/nptl -lpthread
+
 
 
