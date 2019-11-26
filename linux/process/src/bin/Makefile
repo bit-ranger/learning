@@ -33,5 +33,11 @@ fifo_producer: fifo_producer.c
 fifo_consumer: fifo_consumer.c
 	$(CC) fifo_consumer.c -o fifo_consumer
 
+fifo_client: fifo_client.c fifo_client.h
+	$(CC) fifo_client.c fifo_client.h -o fifo_client
+
+fifo_server: fifo_server.c fifo_client.h
+	$(CC) fifo_server.c fifo_client.h -o fifo_server
+
 
 
