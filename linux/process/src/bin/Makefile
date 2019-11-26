@@ -19,4 +19,8 @@ pipe: pipe.c
 	$(CC) pipe.c -o pipe
 
 
+pipe4: pipe4.c
+	$(CC) pipe4.c -o pipe4
+
+
 
