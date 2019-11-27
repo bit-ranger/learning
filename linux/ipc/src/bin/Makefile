@@ -7,10 +7,13 @@ INCLUDE = .
 # Options for development
 CFLAGS = -g -Wall -ansi
 
-all: semaphore
+all: semaphore shared_memery
 
 semaphore: semaphore.c
 	$(CC) semaphore.c -o semaphore
 
+shared_memery: shared_memory1.c shared_memory2.c
+	$(CC) shared_memory1.c -o shared_memory1
+	$(CC) shared_memory2.c -o shared_memory2
 
 
