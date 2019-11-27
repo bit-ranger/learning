@@ -16,4 +16,7 @@ cs1: client1.c server1.c
 hostinfo: hostinfo.c
 	$(CC) hostinfo.c -o hostinfo
 
+serviceinfo: serviceinfo.c
+	$(CC) serviceinfo.c -o serviceinfo
+
 
