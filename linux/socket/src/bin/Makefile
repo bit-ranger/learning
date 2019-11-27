@@ -9,9 +9,9 @@ CFLAGS = -g -Wall -ansi
 
 all: cs1
 
-cs1: client1.c server1.c
-	$(CC) client1.c -o client1
-	$(CC) server1.c -o server1
+cs1: local_client.c local_server.c
+	$(CC) local_client.c -o local_client
+	$(CC) local_server.c -o local_server
 
 
 
