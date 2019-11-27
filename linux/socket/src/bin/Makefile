@@ -19,4 +19,7 @@ hostinfo: hostinfo.c
 serviceinfo: serviceinfo.c
 	$(CC) serviceinfo.c -o serviceinfo
 
+select: select.c
+	$(CC) select.c -o select
+
 
