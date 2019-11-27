@@ -14,8 +14,8 @@
 
 static int set_semvalue(void);
 static void del_semvalue(void);
-static int semaphore_p(void);
-static int semaphore_v(void);
+static int semaphore_acquire(void);
+static int semaphore_release(void);
 
 static int sem_id;
 
@@ -40,22 +40,22 @@ int main(int argc, char *argv[])
     }
 
 /* Then we have a loop which enters and leaves the critical section ten times.
- There, we first make a call to semaphore_p which sets the semaphore to wait, as
+ There, we first make a call to semaphore_acquire which sets the semaphore to wait, as
  this program is about to enter the critical section. */
 
     for(i = 0; i < 10; i++) {        
 
-        if (!semaphore_p()) exit(EXIT_FAILURE);
+        if (!semaphore_acquire()) exit(EXIT_FAILURE);
         printf("%c", op_char);fflush(stdout);
         pause_time = rand() % 3;
         sleep(pause_time);
         printf("%c", op_char);fflush(stdout);
 
-/* After the critical section, we call semaphore_v, setting the semaphore available,
+/* After the critical section, we call semaphore_release, setting the semaphore available,
  before going through the for loop again after a random wait. After the loop, the call
  to del_semvalue is made to clean up the code. */
 
-        if (!semaphore_v()) exit(EXIT_FAILURE);
+        if (!semaphore_release()) exit(EXIT_FAILURE);
         
         pause_time = rand() % 2;
         sleep(pause_time);
@@ -94,9 +94,9 @@ static void del_semvalue(void)
         fprintf(stderr, "Failed to delete semaphore\n");
 }
 
-/* semaphore_p changes the semaphore by -1 (waiting). */
+/* semaphore_acquire changes the semaphore by -1 (waiting). */
 
-static int semaphore_p(void)
+static int semaphore_acquire(void)
 {
     struct sembuf sem_b;
     
@@ -105,16 +105,16 @@ static int semaphore_p(void)
     sem_b.sem_flg = SEM_UNDO;
 
     if (semop(sem_id, &sem_b, 1) == -1) {
-        fprintf(stderr, "semaphore_p failed\n");
+        fprintf(stderr, "semaphore_acquire failed\n");
         return(0);
     }
     return(1);
 }
 
-/* semaphore_v is similar except for setting the sem_op part of the sembuf structure to 1,
+/* semaphore_release is similar except for setting the sem_op part of the sembuf structure to 1,
  so that the semaphore becomes available. */
 
-static int semaphore_v(void)
+static int semaphore_release(void)
 {
     struct sembuf sem_b;
     
@@ -122,7 +122,7 @@ static int semaphore_v(void)
     sem_b.sem_op = 1; /* V() */
     sem_b.sem_flg = SEM_UNDO;
     if (semop(sem_id, &sem_b, 1) == -1) {
-        fprintf(stderr, "semaphore_v failed\n");
+        fprintf(stderr, "semaphore_release failed\n");
         return(0);
     }
     return(1);

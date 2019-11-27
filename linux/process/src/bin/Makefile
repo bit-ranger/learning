@@ -39,9 +39,5 @@ fifo_client: fifo_client.c fifo_client.h
 fifo_server: fifo_server.c fifo_client.h
 	$(CC) fifo_server.c  -o fifo_server
 
-sem1: sem1.c
-	$(CC) sem1.c  -o sem1
-
-
 
 
