@@ -34,10 +34,14 @@ fifo_consumer: fifo_consumer.c
 	$(CC) fifo_consumer.c -o fifo_consumer
 
 fifo_client: fifo_client.c fifo_client.h
-	$(CC) fifo_client.c fifo_client.h -o fifo_client
+	$(CC) fifo_client.c  -o fifo_client
 
 fifo_server: fifo_server.c fifo_client.h
-	$(CC) fifo_server.c fifo_client.h -o fifo_server
+	$(CC) fifo_server.c  -o fifo_server
+
+sem1: sem1.c
+	$(CC) sem1.c  -o sem1
+
 
 
 
