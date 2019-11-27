@@ -3,7 +3,8 @@ members = [
 'file',
 'env',
 'process',
-'ipc'
+'ipc',
+'socket'
 ]
 
 
