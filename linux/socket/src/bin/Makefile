@@ -7,7 +7,7 @@ INCLUDE = .
 # Options for development
 CFLAGS = -g -Wall -ansi -pedantic
 
-all: local net hostinfo serviceinfo_tcp select select_server_multi serviceinfo_udp
+all: local net hostinfo serviceinfo_tcp select_server_multi serviceinfo_udp
 
 local: local_client.c local_server.c
 	$(CC) $(CFLAGS) local_client.c -o local_client
@@ -22,9 +22,6 @@ hostinfo: hostinfo.c
 
 serviceinfo_tcp: serviceinfo_tcp.c
 	$(CC) $(CFLAGS) serviceinfo_tcp.c -o serviceinfo_tcp
-
-select: select.c
-	$(CC) $(CFLAGS) select.c -o select
 
 select_server_multi: select_server_multi.c
 	$(CC) $(CFLAGS) select_server_multi.c -o select_server_multi
