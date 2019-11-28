@@ -26,4 +26,7 @@ serviceinfo: serviceinfo.c
 select: select.c
 	$(CC) select.c -o select
 
+select_server_multi: select_server_multi.c
+	$(CC) select_server_multi.c -o select_server_multi
+
 
