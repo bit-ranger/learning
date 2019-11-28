@@ -17,6 +17,13 @@ net: net_client.c net_server.c
 	$(CC) net_client.c -o net_client
 	$(CC) net_server.c -o net_server
 
+hostinfo: hostinfo.c
+	$(CC) hostinfo.c -o hostinfo
 
+serviceinfo: serviceinfo.c
+	$(CC) serviceinfo.c -o serviceinfo
+
+select: select.c
+	$(CC) select.c -o select
 
 
