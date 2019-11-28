@@ -33,7 +33,8 @@ members = [
 'webserver_demo',
 'async_demo',
 'tax2019',
-'diesel_demo'
+'diesel_demo',
+'serialize'
 ]
 
 
