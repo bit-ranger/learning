@@ -20,8 +20,8 @@ net: net_client.c net_server.c
 hostinfo: hostinfo.c
 	$(CC) hostinfo.c -o hostinfo
 
-serviceinfo: serviceinfo.c
-	$(CC) serviceinfo.c -o serviceinfo
+serviceinfo_tcp: serviceinfo_tcp.c
+	$(CC) serviceinfo_tcp.c -o serviceinfo_tcp
 
 select: select.c
 	$(CC) select.c -o select
