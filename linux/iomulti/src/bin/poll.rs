@@ -7,19 +7,17 @@ fn main() {
 
     let fds = [PollFd::new(file, PollFlags::POLLIN)];
 
-    loop{
-        let mut fds_act = fds;
-        poll(&mut fds_act, 100);
+    let mut fds_act = fds;
+    poll(&mut fds_act, -1);
 
-        for fd in fds_act.iter(){
-            if let Some(flag) =  fd.revents(){
-                if flag & PollFlags::POLLIN == PollFlags::POLLIN{
-                    let mut buffer = [0u8;128];
-                    let nread = read(file, &mut buffer).unwrap();
-                    println!("{}", unsafe { String::from_raw_parts(buffer.as_mut_ptr(), nread, nread) });
-                }
-
+    for fd in fds_act.iter(){
+        if let Some(flag) =  fd.revents(){
+            if flag & PollFlags::POLLIN == PollFlags::POLLIN{
+                let mut buffer = [0u8;128];
+                let nread = read(file, &mut buffer).unwrap();
+                println!("{}", unsafe { String::from_raw_parts(buffer.as_mut_ptr(), nread, nread) });
             }
+
         }
     }
 }
