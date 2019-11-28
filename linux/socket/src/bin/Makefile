@@ -29,4 +29,7 @@ select: select.c
 select_server_multi: select_server_multi.c
 	$(CC) select_server_multi.c -o select_server_multi
 
+serviceinfo_udp: serviceinfo_udp.c
+	$(CC) serviceinfo_udp.c -o serviceinfo_udp
+
 
