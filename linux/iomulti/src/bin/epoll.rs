@@ -15,9 +15,9 @@ fn main() {
 
     for i in 0..epoll_n {
         let eve = events_active[i];
-        let file = eve.data();
+        let fd = eve.data();
         let mut buffer = [0u8;128];
-        let nread = read(file as i32, &mut buffer).unwrap();
+        let nread = read(fd as i32, &mut buffer).unwrap();
         println!("{}", unsafe { String::from_raw_parts(buffer.as_mut_ptr(), nread, nread) });
     }
 
