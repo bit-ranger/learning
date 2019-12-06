@@ -34,7 +34,8 @@ members = [
 'async_demo',
 'tax2019',
 'diesel_demo',
-'serialize'
+'serialize',
+"ffi/fromc"
 ]
 
 
