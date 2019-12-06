@@ -35,7 +35,8 @@ members = [
 'tax2019',
 'diesel_demo',
 'serialize',
-"ffi/fromc"
+"ffi/fromc",
+"ffi/toc"
 ]
 
 
