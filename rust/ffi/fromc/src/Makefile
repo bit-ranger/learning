@@ -7,6 +7,11 @@ INCLUDE = .
 # Options for development
 CFLAGS = -g -Wall -ansi
 
-hello: hello.c
-	$(CC) -c hello.c -o hello.o
-	ar -r libhello.a hello.o
+all: hello_static hello_dynamic
+
+hello_static: hello_static.c
+	$(CC) -c hello_static.c -o hello_static.o
+	ar -r libhello_static.a hello_static.o
+
+hello_dynamic: hello_dynamic.c
+	$(CC) -shared -o libhello_dynamic.so -c -fPIC hello_dynamic.c
