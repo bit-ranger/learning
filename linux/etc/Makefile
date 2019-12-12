@@ -7,7 +7,10 @@ INCLUDE = .
 # Options for development
 CFLAGS = -g -Wall -ansi
 
-all: nbits
+all: nbits bele
 
 nbits: nbits.c
 	$(CC) nbits.c -o nbits
+
+bele: bele.c
+	$(CC) bele.c -o bele
