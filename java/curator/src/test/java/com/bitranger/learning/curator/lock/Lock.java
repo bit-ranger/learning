@@ -1,4 +1,4 @@
-package com.bitranger.learning.curator;
+package com.bitranger.learning.curator.lock;
 
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -6,6 +6,7 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.locks.InterProcessLock;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
+import org.apache.curator.framework.recipes.locks.RevocationListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 import org.junit.After;
@@ -15,7 +16,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-public class Main {
+public class Lock {
 
     // ZooKeeper 锁节点路径, 分布式锁的相关操作都是在这个节点上进行
     private final String lockPath = "/demo/curator/distributed-lock";
@@ -74,7 +75,13 @@ public class Main {
 
     @Test
     public void reentrantLock() throws Exception {
-        InterProcessLock lock = new InterProcessMutex(client, lockPath);
+        InterProcessMutex lock = new InterProcessMutex(client, lockPath);
+        lock.makeRevocable(new RevocationListener<InterProcessMutex>(){
+
+            public void revocationRequested(InterProcessMutex forLock) {
+
+            }
+        });
         // lock2 用于模拟其他客户端
         InterProcessLock lock2 = new InterProcessMutex(client2, lockPath);
         // lock 获取锁
