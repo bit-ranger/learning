@@ -1,0 +1,8 @@
+version: '3'
+services:
+  learning-rust:
+    image: "rust:1.42.0"
+    volumes:
+      - C:\Home\Workspace\repo\bit-ranger\learning\rust:/opt/workspace
+    working_dir: /opt/workspace
+    command: cargo test
