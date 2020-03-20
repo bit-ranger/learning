@@ -15,6 +15,3 @@
     docker pull elasticsearch:7.6.1
     docker pull logstash:7.6.1
     docker pull kibana:7.6.1
-    
-# rust
-    docker pull rust:1.42.0
