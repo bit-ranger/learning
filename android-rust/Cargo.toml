@@ -1,5 +1,5 @@
 [package]
-name = "android-rs"
+name = "android-rust"
 version = "0.1.0"
 authors = ["bit-ranger <sincerebravefight@gmail.com>"]
 edition = "2018"
