@@ -1,5 +1,6 @@
 use jni::JNIEnv;
 use jni::objects::JClass;
+use jni::sys::jstring;
 
 pub extern "system" fn Java_com_github_xxx_yyy_MainActivity_init() {
     // TODO
