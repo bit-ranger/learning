@@ -36,7 +36,8 @@ members = [
 'diesel_demo',
 'serialize',
 #"ffi/fromc",
-#"ffi/toc"
+#"ffi/toc",
+'tool'
 ]
 
 
