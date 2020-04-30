@@ -1,39 +1,90 @@
 use std::fs::File;
 use std::io::{ErrorKind, Read};
-use std::io;
 
 #[derive(Debug)]
-struct Member{
+struct Class{
     name: String,
-    self_type: String,
-    accessibility: String,
-    comment: Vec<String>,
-    members: Vec<Member>
+    qualifier: Vec<String>,
+    comment: Vec<String>
 }
 
-fn parse_class(rows: &Vec<&str>) -> Vec<Member>{
+#[derive(Debug)]
+struct Method{
+    name: String,
+    return_type: String,
+    input_type: Vec<String>,
+    qualifier: Vec<String>,
+    comment: Vec<String>
+}
+
+#[derive(Debug)]
+struct Field{
+    name: String,
+    data_type: String,
+    qualifier: Vec<String>,
+    comment: Vec<String>
+}
+
+#[derive(Debug)]
+enum Member{
+    Class (Class),
+    Method (Method),
+    Field (Field)
+}
+
+
+fn parse_class(tokens: Vec<String>) -> Vec<Member>{
     let mut members : Vec<Member> = Vec::new();
     let mut stack:Vec<String> = Vec::new();
-    for row in rows {
-        let columns:&Vec<&str> =  &row.split_terminator(' ').collect();
-        match columns[0] {
-            "public" | "private" => {
-                let member = Member{
-                    name: String::from(columns[2]),
-                    self_type: String::from(columns[1]),
-                    accessibility: String::from(columns[0]),
-                    comment: stack.clone(),
-                    members: Vec::new()
-                };
-                members.push(member);
-                stack.clear();
-            }
-            _ => {
-                stack.push(columns.join("\n"))
-            }
+    // for tk in tokens {
+    //     match columns[0] {
+    //         "public" | "private" => {
+    //             let member = Member{
+    //                 name: String::from(columns[2]),
+    //                 member_type: String::from(columns[1]),
+    //                 qualifier: String::from(columns[0]),
+    //                 comment: stack.clone(),
+    //                 children: Vec::new()
+    //             };
+    //             members.push(member);
+    //             stack.clear();
+    //         }
+    //         _ => {
+    //             stack.push(columns.join("\n"))
+    //         }
+    //     }
+    // }
+    return members;
+}
+
+fn split_keep<'a>(is_delimiter: fn(char) -> bool, text: &'a str) -> Vec<&'a str> {
+    let mut result: Vec<&str> = Vec::new();
+    let mut li:usize = 0;
+    for (i, c) in text.char_indices(){
+        if is_delimiter(c){
+            result.push(&text[li..i]);
+            result.push(&text[i..i+1]);
+            li = i+1;
         }
     }
-    return members;
+
+    return result;
+}
+
+fn tokenize(text: String) -> Vec<String> {
+    let regex = |c: char| [' ', '\t', '\n', '\r', ';', '(', ')', '{', '}'].contains(&c);
+    let splits = split_keep(regex, text.as_str());
+    return splits.into_iter()
+        .map(|t| t.trim())
+        .filter(|t| !t.is_empty())
+        .map(|t| String::from(t))
+        .collect();
+}
+
+fn parse(text: String) -> Vec<Member>{
+    let tokens = tokenize(text);
+
+    return Vec::new();
 }
 
 fn main() {
@@ -48,16 +99,7 @@ fn main() {
 
     let mut text = String::new();
     f.read_to_string(&mut text);
-
-    let rows:Vec<&str> =  text.split_terminator('\n')
-        .into_iter()
-        .map(|r| r.trim())
-        .filter(|r| !r.is_empty())
-        .collect();
-
-    let members = parse_class(&rows);
+    let members = parse(text);
     print!("{:#?}", members)
-
-
 
 }
