@@ -225,7 +225,7 @@ fn parse_method_meta(meta: &Vec<String>) -> Method{
         } else {
             name_index
         };
-    if ["public","private","static"].contains(&meta[return_type_index].as_str()){
+    if ["public","private","protected","static"].contains(&meta[return_type_index].as_str()){
         return_type_index = name_index;
     }
     let input_type =
