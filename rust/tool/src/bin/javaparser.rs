@@ -5,7 +5,11 @@ use std::io::{ErrorKind, Read};
 struct Class{
     name: String,
     qualifier: Vec<String>,
-    comment: Vec<String>
+    implements: Vec<String>,
+    extends: String,
+    annotation: Vec<String>,
+    comment: Vec<String>,
+    member: Vec<Member>
 }
 
 #[derive(Debug)]
@@ -14,6 +18,7 @@ struct Method{
     return_type: String,
     input_type: Vec<String>,
     qualifier: Vec<String>,
+    annotation: Vec<String>,
     comment: Vec<String>
 }
 
@@ -22,6 +27,7 @@ struct Field{
     name: String,
     data_type: String,
     qualifier: Vec<String>,
+    annotation: Vec<String>,
     comment: Vec<String>
 }
 
@@ -32,32 +38,7 @@ enum Member{
     Field (Field)
 }
 
-
-fn parse_class(tokens: Vec<String>) -> Vec<Member>{
-    let mut members : Vec<Member> = Vec::new();
-    let mut stack:Vec<String> = Vec::new();
-    // for tk in tokens {
-    //     match columns[0] {
-    //         "public" | "private" => {
-    //             let member = Member{
-    //                 name: String::from(columns[2]),
-    //                 member_type: String::from(columns[1]),
-    //                 qualifier: String::from(columns[0]),
-    //                 comment: stack.clone(),
-    //                 children: Vec::new()
-    //             };
-    //             members.push(member);
-    //             stack.clear();
-    //         }
-    //         _ => {
-    //             stack.push(columns.join("\n"))
-    //         }
-    //     }
-    // }
-    return members;
-}
-
-fn split_keep<'a>(is_delimiter: fn(char) -> bool, text: &'a str) -> Vec<&'a str> {
+fn split_keep(is_delimiter: fn(char) -> bool, text: &str) -> Vec<&str> {
     let mut result: Vec<&str> = Vec::new();
     let mut li:usize = 0;
     for (i, c) in text.char_indices(){
@@ -72,19 +53,127 @@ fn split_keep<'a>(is_delimiter: fn(char) -> bool, text: &'a str) -> Vec<&'a str>
 }
 
 fn tokenize(text: String) -> Vec<String> {
-    let regex = |c: char| [' ', '\t', '\n', '\r', ';', '(', ')', '{', '}'].contains(&c);
-    let splits = split_keep(regex, text.as_str());
+    let is_delimiter = |c: char| [' ', '\t', '\n', '\r', ';', '(', ')', '{', '}'].contains(&c);
+    let splits = split_keep(is_delimiter, text.as_str());
     return splits.into_iter()
-        .map(|t| t.trim())
-        .filter(|t| !t.is_empty())
         .map(|t| String::from(t))
         .collect();
 }
 
-fn parse(text: String) -> Vec<Member>{
-    let tokens = tokenize(text);
+fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
+    let mut member_list: Vec<Member> = Vec::new();
+    let mut meta_left = 0;
+    let mut comment: Vec<String> = Vec::new();
+    let mut annotation: Vec<String> = Vec::new();
+    for (i,t) in tokens.iter().enumerate(){
+        if i < meta_left {
+            continue;
+        }
+        if t.starts_with("/*"){
+            let right_index = i + tokens[i..].iter().position(|e| e.ends_with("*/")).unwrap();
+            comment.push(tokens[i..right_index+1].join(""));
+            meta_left = right_index+1;
+            continue;
+        }
+        if t.starts_with("//"){
+            let right_index = i + tokens[i..].iter().position(|e| e.eq("\n")).unwrap();
+            comment.push(trim_join(tokens[i..right_index+1].to_vec(), ""));
+            meta_left = right_index+1;
+            continue;
+        }
+        if t.starts_with("@"){
+            if tokens[i+1].eq("("){
+                let right_index = match_right(tokens, i+1, &String::from(")"));
+                annotation.push(trim_join(tokens[i..right_index+1].to_vec(), ""));
+                meta_left = right_index+1;
+            } else {
+                let right_index = i + tokens[i..].iter().position(|e| e.eq("\n")).unwrap();
+                annotation.push(trim_join(tokens[i..right_index+1].to_vec(), ""));
+                meta_left = right_index+1;
+            }
 
-    return Vec::new();
+            continue;
+        }
+        if t.eq("{"){
+            let right_index = match_right(tokens, i, &String::from("}"));
+
+            let meta = tokens[meta_left..i].to_vec();
+            if meta.into_iter().rfind(|e| e.eq(")")).is_none(){
+                // let class_meta = parse_class_meta(&meta);
+                let class_member =  parse_tokens(&tokens[i+1..right_index+1].to_vec());
+            } else {
+
+            }
+
+            annotation.clear();
+            comment.clear();
+            meta_left = right_index+1;
+            continue;
+        }
+        if t.eq(";"){
+            let meta = tokens[meta_left..i].to_vec();
+            if !meta[0].eq("package") && !meta[0].eq("import"){
+                let mut field = parse_field_meta(&meta);
+                field.annotation = annotation.clone();
+                field.comment = comment.clone();
+                member_list.push(Member::Field(field));
+            }
+            annotation.clear();
+            comment.clear();
+            meta_left = i+1;
+            continue;
+        }
+    }
+    return member_list;
+}
+
+// fn meta_left_index(tokens: &Vec<String>, meta_right_index: usize) -> usize{
+//     return tokens[..meta_right_index].iter().rposition(|e|  e.eq(";")).unwrap()+1;
+// }
+
+// fn parse_class_meta(meta: &Vec<String>) -> Class{
+//     meta.
+// }
+
+// fn parse_method_meta(meta: &Vec<String>) -> Method{
+//
+// }
+
+fn parse_field_meta(meta: &Vec<String>) ->  Field{
+
+    return Field{
+        name: meta[meta.len()-1].clone(),
+        data_type: meta[meta.len()-2].clone(),
+        qualifier: meta[..meta.len()-3].to_vec(),
+        annotation: Vec::with_capacity(0),
+        comment: Vec::with_capacity(0)
+    }
+}
+
+fn match_right(tokens: &Vec<String>, left_index: usize, right_token: &String) -> usize{
+    let left_token = tokens.get(left_index).unwrap();
+    let mut entrant = 0;
+    for (i,t) in tokens[left_index..].iter().enumerate(){
+        if t.eq(left_token){
+            entrant +=1;
+        }
+        if t.eq(right_token){
+            entrant -=1;
+            if entrant == 0 {
+                return i+left_index;
+            }
+        }
+    }
+    return 0;
+}
+
+fn trim_join(tokens: Vec<String>, sep: &str) -> String {
+    return tokens.iter()
+        .map(|e| e.trim())
+        .filter(|e| !e.is_empty())
+        .map(|e| String::from(e))
+        .collect::<Vec<String>>()
+        .join(sep);
 }
 
 fn main() {
@@ -99,7 +188,8 @@ fn main() {
 
     let mut text = String::new();
     f.read_to_string(&mut text);
-    let members = parse(text);
+    let tokens = tokenize(text);
+    let members = parse_tokens(&tokens);
     print!("{:#?}", members)
 
 }
