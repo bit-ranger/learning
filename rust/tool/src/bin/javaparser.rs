@@ -1,6 +1,5 @@
 use std::fs::File;
 use std::io::{ErrorKind, Read};
-use std::process::exit;
 
 #[derive(Debug)]
 struct Class{
@@ -33,10 +32,18 @@ struct Field{
 }
 
 #[derive(Debug)]
+struct FileHead{
+    comment: Vec<String>,
+    import: Vec<String>,
+    package: String
+}
+
+#[derive(Debug)]
 enum Member{
     Class (Class),
     Method (Method),
-    Field (Field)
+    Field (Field),
+    FileHead(FileHead)
 }
 
 fn split_keep(is_delimiter: fn(char) -> bool, text: &str) -> Vec<&str> {
@@ -61,7 +68,7 @@ fn tokenize(text: String) -> Vec<String> {
         .collect();
 }
 
-fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
+fn parse_body(tokens: &Vec<String>) -> Vec<Member>{
     let mut member_list: Vec<Member> = Vec::new();
     let mut meta_left = 0;
     let mut comment: Vec<String> = Vec::new();
@@ -78,18 +85,18 @@ fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
         }
         if t.starts_with("//"){
             let right_index = i + tokens[i..].iter().position(|e| e.eq("\n")).unwrap();
-            comment.push(trim_and_filter(tokens[i..right_index+1].to_vec()).join(""));
+            comment.push(trim_and_remove_empty(tokens[i..right_index+1].to_vec()).join(""));
             meta_left = right_index+1;
             continue;
         }
         if t.starts_with("@"){
             if tokens[i+1].eq("("){
                 let right_index = match_right(tokens, i+1, &String::from(")"));
-                annotation.push(trim_and_filter(tokens[i..right_index+1].to_vec()).join(""));
+                annotation.push(trim_and_remove_empty(tokens[i..right_index+1].to_vec()).join(""));
                 meta_left = right_index+1;
             } else {
                 let right_index = i + tokens[i..].iter().position(|e| e.eq("\n")).unwrap();
-                annotation.push(trim_and_filter(tokens[i..right_index+1].to_vec()).join(""));
+                annotation.push(trim_and_remove_empty(tokens[i..right_index+1].to_vec()).join(""));
                 meta_left = right_index+1;
             }
 
@@ -98,10 +105,10 @@ fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
         if t.eq("{"){
             let right_index = match_right(tokens, i, &String::from("}"));
 
-            let meta = trim_and_filter(tokens[meta_left..i].to_vec());
+            let meta = trim_and_remove_empty(tokens[meta_left..i].to_vec());
             if meta.iter().position(|e| e.eq("(")).is_none(){
                 let mut class = parse_class_meta(&meta);
-                let class_member =  parse_tokens(&tokens[i+1..right_index+1].to_vec());
+                let class_member =  parse_body(&tokens[i+1..right_index+1].to_vec());
                 class.annotation = annotation.clone();
                 class.comment = comment.clone();
                 class.member = class_member;
@@ -116,19 +123,67 @@ fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
             continue;
         }
         if t.eq(";"){
-            let meta = trim_and_filter(tokens[meta_left..i].to_vec());
-            if !meta[0].eq("package") && !meta[0].eq("import"){
-                let mut field = parse_field_meta(&meta);
-                field.annotation = annotation.clone();
-                field.comment = comment.clone();
-                member_list.push(Member::Field(field));
-            }
+            let meta = trim_and_remove_empty(tokens[meta_left..i].to_vec());
+            let mut field = parse_field_meta(&meta);
+            field.annotation = annotation.clone();
+            field.comment = comment.clone();
+            member_list.push(Member::Field(field));
             annotation.clear();
             comment.clear();
             meta_left = i+1;
             continue;
         }
     }
+    return member_list;
+}
+
+fn parse_file(tokens: &Vec<String>) -> Vec<Member>{
+    let mut member_list: Vec<Member> = Vec::new();
+    let mut comment: Vec<String> = Vec::new();
+    let mut comment_enable = true;
+    let mut package:Option<String>  = Option::None;
+    let mut import: Vec<String> = Vec::new();
+    let mut meta_left = 0;
+    for (i,t) in tokens.iter().enumerate(){
+        if i < meta_left {
+            continue;
+        }
+        if t.trim().is_empty(){
+            continue;
+        }
+        if comment_enable && t.starts_with("/*"){
+            let right_index = i + tokens[i..].iter().position(|e| e.ends_with("*/")).unwrap();
+            comment.push(tokens[i..right_index+1].join(""));
+            meta_left = right_index+1;
+            continue;
+        }
+        if t.eq("package"){
+            let right_index = i + tokens[i..].iter().position(|e| e.eq(";")).unwrap();
+            package = Option::Some(trim_and_remove_empty(tokens[i+1..right_index+1].to_vec()).join(""));
+            comment_enable = false;
+            meta_left = right_index+1;
+            continue;
+        }
+
+        if t.eq("import"){
+            let right_index = i + tokens[i..].iter().position(|e| e.eq(";")).unwrap();
+            import.push(trim_and_remove_empty(tokens[i+1..right_index+1].to_vec()).join(""));
+            meta_left = right_index+1;
+            continue;
+        }
+
+        meta_left = i;
+        break;
+    }
+
+    member_list.push(Member::FileHead(FileHead{
+        comment: comment,
+        package: package.unwrap(),
+        import: import
+    }));
+
+    let body_member =  parse_body(tokens[meta_left..].to_vec().as_ref());
+    member_list.extend(body_member);
     return member_list;
 }
 
@@ -183,7 +238,7 @@ fn match_right(tokens: &Vec<String>, left_index: usize, right_token: &String) ->
     return 0;
 }
 
-fn trim_and_filter(tokens: Vec<String>) -> Vec<String> {
+fn trim_and_remove_empty(tokens: Vec<String>) -> Vec<String> {
     return tokens.iter()
         .map(|e| e.trim())
         .filter(|e| !e.is_empty())
@@ -204,7 +259,7 @@ fn main() {
     let mut text = String::new();
     f.read_to_string(&mut text);
     let tokens = tokenize(text);
-    let members = parse_tokens(&tokens);
+    let members = parse_file(&tokens);
     print!("{:#?}", members)
 
 }
