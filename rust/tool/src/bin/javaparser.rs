@@ -1,12 +1,13 @@
 use std::fs::File;
 use std::io::{ErrorKind, Read};
+use std::process::exit;
 
 #[derive(Debug)]
 struct Class{
     name: String,
     qualifier: Vec<String>,
     implements: Vec<String>,
-    extends: String,
+    extends: Option<String>,
     annotation: Vec<String>,
     comment: Vec<String>,
     member: Vec<Member>
@@ -77,18 +78,18 @@ fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
         }
         if t.starts_with("//"){
             let right_index = i + tokens[i..].iter().position(|e| e.eq("\n")).unwrap();
-            comment.push(trim_join(tokens[i..right_index+1].to_vec(), ""));
+            comment.push(trim_and_filter(tokens[i..right_index+1].to_vec()).join(""));
             meta_left = right_index+1;
             continue;
         }
         if t.starts_with("@"){
             if tokens[i+1].eq("("){
                 let right_index = match_right(tokens, i+1, &String::from(")"));
-                annotation.push(trim_join(tokens[i..right_index+1].to_vec(), ""));
+                annotation.push(trim_and_filter(tokens[i..right_index+1].to_vec()).join(""));
                 meta_left = right_index+1;
             } else {
                 let right_index = i + tokens[i..].iter().position(|e| e.eq("\n")).unwrap();
-                annotation.push(trim_join(tokens[i..right_index+1].to_vec(), ""));
+                annotation.push(trim_and_filter(tokens[i..right_index+1].to_vec()).join(""));
                 meta_left = right_index+1;
             }
 
@@ -97,10 +98,14 @@ fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
         if t.eq("{"){
             let right_index = match_right(tokens, i, &String::from("}"));
 
-            let meta = tokens[meta_left..i].to_vec();
-            if meta.into_iter().rfind(|e| e.eq(")")).is_none(){
-                // let class_meta = parse_class_meta(&meta);
+            let meta = trim_and_filter(tokens[meta_left..i].to_vec());
+            if meta.iter().position(|e| e.eq("(")).is_none(){
+                let mut class = parse_class_meta(&meta);
                 let class_member =  parse_tokens(&tokens[i+1..right_index+1].to_vec());
+                class.annotation = annotation.clone();
+                class.comment = comment.clone();
+                class.member = class_member;
+                member_list.push(Member::Class(class));
             } else {
 
             }
@@ -111,7 +116,7 @@ fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
             continue;
         }
         if t.eq(";"){
-            let meta = tokens[meta_left..i].to_vec();
+            let meta = trim_and_filter(tokens[meta_left..i].to_vec());
             if !meta[0].eq("package") && !meta[0].eq("import"){
                 let mut field = parse_field_meta(&meta);
                 field.annotation = annotation.clone();
@@ -131,20 +136,31 @@ fn parse_tokens(tokens: &Vec<String>) -> Vec<Member>{
 //     return tokens[..meta_right_index].iter().rposition(|e|  e.eq(";")).unwrap()+1;
 // }
 
-// fn parse_class_meta(meta: &Vec<String>) -> Class{
-//     meta.
-// }
+fn parse_class_meta(meta: &Vec<String>) -> Class{
+    let implements_index = meta.iter().position(|e| e.eq("implements"));
+    let extends_index = meta.iter().position(|e| e.eq("extends"));
+    let class_index = meta.iter().position(|e| e.eq("class"));
+
+    return Class{
+        name: meta[class_index.unwrap()+1].clone(),
+        qualifier: meta[..class_index.unwrap()].to_vec(),
+        implements: if implements_index.is_some() { meta[implements_index.unwrap()..].to_vec() } else { Vec::with_capacity(0) },
+        extends: if extends_index.is_some(){ Option::Some(meta[extends_index.unwrap()+1].clone()) } else {Option::None},
+        member: Vec::with_capacity(0),
+        annotation: Vec::with_capacity(0),
+        comment: Vec::with_capacity(0)
+    }
+}
 
 // fn parse_method_meta(meta: &Vec<String>) -> Method{
 //
 // }
 
 fn parse_field_meta(meta: &Vec<String>) ->  Field{
-
     return Field{
         name: meta[meta.len()-1].clone(),
         data_type: meta[meta.len()-2].clone(),
-        qualifier: meta[..meta.len()-3].to_vec(),
+        qualifier: meta[..meta.len()-2].to_vec(),
         annotation: Vec::with_capacity(0),
         comment: Vec::with_capacity(0)
     }
@@ -167,13 +183,12 @@ fn match_right(tokens: &Vec<String>, left_index: usize, right_token: &String) ->
     return 0;
 }
 
-fn trim_join(tokens: Vec<String>, sep: &str) -> String {
+fn trim_and_filter(tokens: Vec<String>) -> Vec<String> {
     return tokens.iter()
         .map(|e| e.trim())
         .filter(|e| !e.is_empty())
         .map(|e| String::from(e))
-        .collect::<Vec<String>>()
-        .join(sep);
+        .collect::<Vec<String>>();
 }
 
 fn main() {
