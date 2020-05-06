@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::{ErrorKind, Read};
 use std::env;
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct Class {
     name: String,
     qualifier: Vec<String>,
@@ -13,7 +13,7 @@ struct Class {
     member: Vec<Member>,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct Method {
     name: String,
     return_type: String,
@@ -23,7 +23,7 @@ struct Method {
     comment: Vec<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct Field {
     name: String,
     data_type: String,
@@ -32,14 +32,14 @@ struct Field {
     comment: Vec<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 struct FileHead {
     comment: Vec<String>,
     import: Vec<String>,
     package: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 enum Member {
     Class(Class),
     Method(Method),
@@ -290,6 +290,18 @@ fn trim_and_remove_empty(tokens: Vec<String>) -> Vec<String> {
         .collect::<Vec<String>>();
 }
 
+fn to_flat(members:&Vec<Member>, flat_member_container:&mut Vec<Member>, is_include: fn(&Member) -> bool){
+    for m in members{
+        if is_include(m){
+            flat_member_container.push(m.clone());
+            if let Member::Class(class) = m{
+                to_flat(class.member.to_vec().as_ref(), flat_member_container, is_include);
+            }
+        }
+
+    }
+}
+
 fn main() {
     let file_path = env::args()
         .nth(1)
@@ -307,5 +319,10 @@ fn main() {
     let _ = f.read_to_string(&mut text);
     let tokens = tokenize(text);
     let members = parse_file(&tokens);
-    print!("{:#?}", members)
+
+
+    let mut flat_member_container:Vec<Member> = Vec::new();
+    to_flat(&members, &mut flat_member_container, |e| match e {Member::Class(_) | Member::Field(_) => true, _ => false});
+
+    print!("{:#?}", flat_member_container);
 }
