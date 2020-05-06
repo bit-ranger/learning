@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::{ErrorKind, Read};
+use std::env;
 
 #[derive(Debug)]
 struct Class{
@@ -61,7 +62,7 @@ fn split_keep(is_delimiter: fn(char) -> bool, text: &str) -> Vec<&str> {
 }
 
 fn tokenize(text: String) -> Vec<String> {
-    let is_delimiter = |c: char| [' ', '\t', '\n', '\r', ';', '(', ')', '{', '}'].contains(&c);
+    let is_delimiter = |c: char| [' ', '\t', '\n', '\r', ',', ';', '(', ')', '{', '}'].contains(&c);
     let splits = split_keep(is_delimiter, text.as_str());
     return splits.into_iter()
         .map(|t| String::from(t))
@@ -114,7 +115,10 @@ fn parse_body(tokens: &Vec<String>) -> Vec<Member>{
                 class.member = class_member;
                 member_list.push(Member::Class(class));
             } else {
-
+                let mut method = parse_method_meta(&meta);
+                method.annotation = annotation.clone();
+                method.comment = comment.clone();
+                member_list.push(Member::Method(method));
             }
 
             annotation.clear();
@@ -159,7 +163,7 @@ fn parse_file(tokens: &Vec<String>) -> Vec<Member>{
         }
         if t.eq("package"){
             let right_index = i + tokens[i..].iter().position(|e| e.eq(";")).unwrap();
-            package = Option::Some(trim_and_remove_empty(tokens[i+1..right_index+1].to_vec()).join(""));
+            package = Option::Some(trim_and_remove_empty(tokens[i+1..right_index].to_vec()).join(""));
             comment_enable = false;
             meta_left = right_index+1;
             continue;
@@ -167,7 +171,7 @@ fn parse_file(tokens: &Vec<String>) -> Vec<Member>{
 
         if t.eq("import"){
             let right_index = i + tokens[i..].iter().position(|e| e.eq(";")).unwrap();
-            import.push(trim_and_remove_empty(tokens[i+1..right_index+1].to_vec()).join(""));
+            import.push(trim_and_remove_empty(tokens[i+1..right_index].to_vec()).join(""));
             meta_left = right_index+1;
             continue;
         }
@@ -207,15 +211,54 @@ fn parse_class_meta(meta: &Vec<String>) -> Class{
     }
 }
 
-// fn parse_method_meta(meta: &Vec<String>) -> Method{
-//
-// }
+/**
+public String getString(String a, int b){
+
+*/
+
+fn parse_method_meta(meta: &Vec<String>) -> Method{
+    let left_bracket_index =  meta.iter().position(|e| e.eq("(")).unwrap();
+    let name_index = left_bracket_index-1;
+    let mut return_type_index =
+        if left_bracket_index > 1 {
+            name_index - 1
+        } else {
+            name_index
+        };
+    if ["public","private","static"].contains(&meta[return_type_index].as_str()){
+        return_type_index = name_index;
+    }
+    let input_type =
+        if left_bracket_index == meta.len() - 2 {
+            Vec::with_capacity(0)
+        } else {
+            meta[left_bracket_index..meta.len()]
+                .iter()
+                .enumerate()
+                .filter(|(i, _)| i % 3 == 1)
+                .map(|(_, e)| String::from(e))
+                .collect()
+        };
+    return Method{
+        name: meta[name_index].clone(),
+        input_type: input_type,
+        return_type: meta[return_type_index].clone(),
+        qualifier: meta[..return_type_index].to_vec(),
+        annotation: Vec::with_capacity(0),
+        comment: Vec::with_capacity(0)
+    }
+}
 
 fn parse_field_meta(meta: &Vec<String>) ->  Field{
+    let eq_index =  meta.iter().position(|e| e.eq("="));
+    let define = match eq_index {
+        Some(index) => meta[..index].to_vec(),
+        None => meta.to_vec()
+    };
     return Field{
-        name: meta[meta.len()-1].clone(),
-        data_type: meta[meta.len()-2].clone(),
-        qualifier: meta[..meta.len()-2].to_vec(),
+        name: define[define.len()-1].clone(),
+        data_type: define[define.len()-2].clone(),
+        qualifier: define[..define.len()-2].to_vec(),
         annotation: Vec::with_capacity(0),
         comment: Vec::with_capacity(0)
     }
@@ -247,7 +290,10 @@ fn trim_and_remove_empty(tokens: Vec<String>) -> Vec<String> {
 }
 
 fn main() {
-    let f = File::open("C:\\Home\\Workspace\\repo\\starunion\\starunion\\starunion-tracker\\starunion-tracker-interface\\src\\main\\java\\com\\starunion\\tracker\\param\\PenaltyTransferArtificialHandleParam.java");
+    let file_path = env::args()
+        .nth(1)
+        .expect("require file_path");
+    let f = File::open(file_path);
     let mut f = match f {
         Ok(file) => file,
         Err(error) => match error.kind() {
@@ -257,7 +303,7 @@ fn main() {
     };
 
     let mut text = String::new();
-    f.read_to_string(&mut text);
+    let _ = f.read_to_string(&mut text);
     let tokens = tokenize(text);
     let members = parse_file(&tokens);
     print!("{:#?}", members)
