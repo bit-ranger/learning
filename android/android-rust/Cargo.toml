@@ -1,0 +1,19 @@
+[package]
+name = "android-rust"
+version = "0.1.0"
+authors = ["bit-ranger <sincerebravefight@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[target.'cfg(target_os="android")'.dependencies]
+jni = { version = "0.16.0", default-features = false }
+error-chain = { version = "0.12", default-features = false }
+log = "0.4"
+android_logger = "0.5"
+
+[lib]
+# 编译的动态库名字
+name = "android_rust"
+# 编译类型 cdylib 指定为动态库
+crate-type = ["cdylib"]

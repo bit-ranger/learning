@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.bitranger</groupId>
-    <artifactId>demo-netty</artifactId>
+    <artifactId>learning-java-netty</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 
