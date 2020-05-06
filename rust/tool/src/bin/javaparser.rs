@@ -290,15 +290,14 @@ fn trim_and_remove_empty(tokens: Vec<String>) -> Vec<String> {
         .collect::<Vec<String>>();
 }
 
-fn to_flat(members:&Vec<Member>, flat_member_container:&mut Vec<Member>, is_include: fn(&Member) -> bool){
+fn to_flat_class(members:&Vec<Member>, flat_class_container:&mut Vec<Member>){
     for m in members{
-        if is_include(m){
-            flat_member_container.push(m.clone());
-            if let Member::Class(class) = m{
-                to_flat(class.member.to_vec().as_ref(), flat_member_container, is_include);
+        if let Member::Class(class) = m{
+            flat_class_container.push(m.clone());
+            if !class.member.is_empty(){
+                to_flat_class(class.member.to_vec().as_ref(), flat_class_container);
             }
         }
-
     }
 }
 
@@ -322,7 +321,7 @@ fn main() {
 
 
     let mut flat_member_container:Vec<Member> = Vec::new();
-    to_flat(&members, &mut flat_member_container, |e| match e {Member::Class(_) | Member::Field(_) => true, _ => false});
+    to_flat_class(&members, &mut flat_member_container);
 
     print!("{:#?}", flat_member_container);
 }
