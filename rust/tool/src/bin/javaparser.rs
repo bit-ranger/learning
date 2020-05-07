@@ -329,23 +329,6 @@ fn match_right(tokens: &Vec<String>, left_index: usize, right_token: &String) ->
     return 0;
 }
 
-fn match_left(tokens: &Vec<String>, right_index: usize, left_token: &String) -> usize {
-    let right_token = tokens.get(right_index).unwrap();
-    let mut entrant = 0;
-    for (i, t) in tokens[..right_index].iter().rev().enumerate() {
-        if t.eq(right_token) {
-            entrant += 1;
-        }
-        if t.eq(left_token) {
-            entrant -= 1;
-            if entrant == 0 {
-                return right_index - i;
-            }
-        }
-    }
-    return 0;
-}
-
 fn trim_and_remove_empty(tokens: Vec<String>) -> Vec<String> {
     return tokens.iter()
         .map(|e| e.trim())
