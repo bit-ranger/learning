@@ -3,8 +3,9 @@ use std::io::{ErrorKind, Read, Write};
 use std::env;
 
 #[derive(Debug,Clone)]
-struct Class {
+struct Type {
     name: String,
+    category: String,
     qualifier: Vec<String>,
     implements: Vec<String>,
     extends: Option<String>,
@@ -16,6 +17,7 @@ struct Class {
 #[derive(Debug,Clone)]
 struct Method {
     name: String,
+    is_abstract: bool,
     return_type: String,
     input_type: Vec<String>,
     qualifier: Vec<String>,
@@ -41,7 +43,7 @@ struct FileHead {
 
 #[derive(Debug,Clone)]
 enum Member {
-    Class(Class),
+    Type(Type),
     Method(Method),
     Field(Field),
     FileHead(FileHead),
@@ -62,14 +64,14 @@ fn split_keep(is_delimiter: fn(char) -> bool, text: &str) -> Vec<&str> {
 }
 
 fn tokenize(text: String) -> Vec<String> {
-    let is_delimiter = |c: char| [' ', '\t', '\n', '\r', ',', ';', '(', ')', '{', '}'].contains(&c);
+    let is_delimiter = |c: char| [' ', '\t', '\n', '\r', ',', ';', '(', ')', '{', '}', '<', '>'].contains(&c);
     let splits = split_keep(is_delimiter, text.as_str());
     return splits.into_iter()
         .map(|t| String::from(t))
         .collect();
 }
 
-fn parse_body(tokens: &Vec<String>) -> Vec<Member> {
+fn parse_type(tokens: &Vec<String>) -> Vec<Member> {
     let mut member_list: Vec<Member> = Vec::new();
     let mut meta_left = 0;
     let mut comment: Vec<String> = Vec::new();
@@ -100,27 +102,25 @@ fn parse_body(tokens: &Vec<String>) -> Vec<Member> {
                 annotation.push(trim_and_remove_empty(tokens[i..right_index + 1].to_vec()).join(""));
                 meta_left = right_index + 1;
             }
-
             continue;
         }
         if t.eq("{") {
             let right_index = match_right(tokens, i, &String::from("}"));
-
             let meta = trim_and_remove_empty(tokens[meta_left..i].to_vec());
-            if meta.iter().position(|e| e.eq("(")).is_none() {
-                let mut class = parse_class_meta(&meta);
-                let class_member = parse_body(&tokens[i + 1..right_index + 1].to_vec());
-                class.annotation = annotation.clone();
-                class.comment = comment.clone();
-                class.member = class_member;
-                member_list.push(Member::Class(class));
-            } else {
+            if is_method_meta(&meta) {
                 let mut method = parse_method_meta(&meta);
+                method.is_abstract = false;
                 method.annotation = annotation.clone();
                 method.comment = comment.clone();
                 member_list.push(Member::Method(method));
+            } else {
+                let mut type_ = parse_type_meta(&meta);
+                let class_member = parse_type(&tokens[i + 1..right_index + 1].to_vec());
+                type_.annotation = annotation.clone();
+                type_.comment = comment.clone();
+                type_.member = class_member;
+                member_list.push(Member::Type(type_));
             }
-
             annotation.clear();
             comment.clear();
             meta_left = right_index + 1;
@@ -128,10 +128,18 @@ fn parse_body(tokens: &Vec<String>) -> Vec<Member> {
         }
         if t.eq(";") {
             let meta = trim_and_remove_empty(tokens[meta_left..i].to_vec());
-            let mut field = parse_field_meta(&meta);
-            field.annotation = annotation.clone();
-            field.comment = comment.clone();
-            member_list.push(Member::Field(field));
+            if is_method_meta(&meta){
+                let mut method = parse_method_meta(&meta);
+                method.is_abstract = true;
+                method.annotation = annotation.clone();
+                method.comment = comment.clone();
+                member_list.push(Member::Method(method));
+            } else{
+                let mut field = parse_field_meta(&meta);
+                field.annotation = annotation.clone();
+                field.comment = comment.clone();
+                member_list.push(Member::Field(field));
+            }
             annotation.clear();
             comment.clear();
             meta_left = i + 1;
@@ -186,56 +194,109 @@ fn parse_file(tokens: &Vec<String>) -> Vec<Member> {
         import: import,
     }));
 
-    let body_member = parse_body(tokens[meta_left..].to_vec().as_ref());
+    let body_member = parse_type(tokens[meta_left..].to_vec().as_ref());
     member_list.extend(body_member);
     return member_list;
 }
 
-fn parse_class_meta(meta: &Vec<String>) -> Class {
+fn parse_type_meta(meta: &Vec<String>) -> Type {
     let implements_index = meta.iter().position(|e| e.eq("implements"));
     let extends_index = meta.iter().position(|e| e.eq("extends"));
     let class_index = meta.iter().position(|e| e.eq("class"));
+    let interface_index = meta.iter().position(|e| e.eq("interface"));
+    let enum_index = meta.iter().position(|e| e.eq("enum"));
+    let category_index = match class_index {
+        Some(ci) => ci,
+        None => match interface_index {
+            Some(ii) => ii,
+            None => enum_index.unwrap()
+        }
+    };
 
-    return Class {
-        name: meta[class_index.unwrap() + 1].clone(),
-        qualifier: meta[..class_index.unwrap()].to_vec(),
-        implements: if implements_index.is_some() { meta[implements_index.unwrap()..].to_vec() } else { Vec::with_capacity(0) },
-        extends: if extends_index.is_some() { Option::Some(meta[extends_index.unwrap() + 1].clone()) } else { Option::None },
+    return Type {
+        name: meta[category_index + 1 .. match extends_index {
+            Some(ei) => ei,
+            None => match implements_index {
+                Some(ii) => ii,
+                None => meta.len()
+            }
+        }].join(""),
+        category: meta[category_index].clone(),
+        qualifier: meta[..category_index].to_vec(),
+        implements: match implements_index {
+            Some(ii) => meta[ii..].to_vec(),
+            None => Vec::with_capacity(0)
+        },
+        extends: match extends_index {
+            Some(ei) => Some(meta[ei + 1..match implements_index {
+                Some(ii) => ii,
+                None => meta.len()
+            }].join("")),
+            None => None
+        },
         member: Vec::with_capacity(0),
         annotation: Vec::with_capacity(0),
         comment: Vec::with_capacity(0),
     };
 }
 
+fn is_method_meta(meta: &Vec<String>) -> bool{
+    return  meta.iter().position(|e| e.eq("(")).is_some()
+}
+
 fn parse_method_meta(meta: &Vec<String>) -> Method {
     let left_bracket_index = meta.iter().position(|e| e.eq("(")).unwrap();
     let name_index = left_bracket_index - 1;
-    let mut return_type_index =
-        if left_bracket_index > 1 {
-            name_index - 1
-        } else {
-            name_index
-        };
-    if ["public", "private", "protected", "static"].contains(&meta[return_type_index].as_str()) {
-        return_type_index = name_index;
-    }
+    // let mut return_type_index =
+    //     if left_bracket_index > 1 {
+    //         name_index - 1
+    //     } else {
+    //         name_index
+    //     };
+    // if  {
+    //     return_type_index = name_index;
+    // }
+    let qualifier_list = ["public", "private", "protected", "static"];
+    let last_qualifier_index = meta[..name_index]
+        .iter()
+        .position(|e| qualifier_list.contains(&e.as_str()));
+
+
     let input_type =
         if left_bracket_index == meta.len() - 2 {
             Vec::with_capacity(0)
         } else {
             let mut it = Vec::new();
+            let mut last_it_push_idx = left_bracket_index;
             for (i, e) in meta.iter().enumerate() {
                 if e.eq(",") || i == meta.len() - 1 {
-                    it.push(String::from(&meta[i - 2]))
+                    it.push(meta[last_it_push_idx+1 .. i-1].join(""));
+                    last_it_push_idx = i;
                 }
             }
             it
         };
     return Method {
         name: meta[name_index].clone(),
+        is_abstract: true,
         input_type: input_type,
-        return_type: meta[return_type_index].clone(),
-        qualifier: meta[..return_type_index].to_vec(),
+        return_type: match last_qualifier_index {
+            Some(lqi) => {
+                if name_index-lqi==1 {
+                    meta[lqi+1..name_index+1].join("")
+                } else{
+                    meta[lqi+1..name_index].join("")
+                }
+            },
+            None => {
+                if name_index==0 {
+                    meta[..name_index+1].join("")
+                } else{
+                    meta[..name_index].join("")
+                }
+            }
+        },
+        qualifier: meta[..match last_qualifier_index { Some(lqi) => lqi, None => 0}].to_vec(),
         annotation: Vec::with_capacity(0),
         comment: Vec::with_capacity(0),
     };
@@ -277,6 +338,23 @@ fn match_right(tokens: &Vec<String>, left_index: usize, right_token: &String) ->
     return 0;
 }
 
+fn match_left(tokens: &Vec<String>, right_index: usize, left_token: &String) -> usize {
+    let right_token = tokens.get(right_index).unwrap();
+    let mut entrant = 0;
+    for (i, t) in tokens[..right_index].iter().rev().enumerate() {
+        if t.eq(right_token) {
+            entrant += 1;
+        }
+        if t.eq(left_token) {
+            entrant -= 1;
+            if entrant == 0 {
+                return right_index - i;
+            }
+        }
+    }
+    return 0;
+}
+
 fn trim_and_remove_empty(tokens: Vec<String>) -> Vec<String> {
     return tokens.iter()
         .map(|e| e.trim())
@@ -287,7 +365,7 @@ fn trim_and_remove_empty(tokens: Vec<String>) -> Vec<String> {
 
 fn to_flat_class(members:&Vec<Member>, flat_class_container:&mut Vec<Member>){
     for m in members{
-        if let Member::Class(class) = m{
+        if let Member::Type(class) = m{
             flat_class_container.push(m.clone());
             if !class.member.is_empty(){
                 to_flat_class(class.member.to_vec().as_ref(), flat_class_container);
@@ -340,7 +418,7 @@ fn export(members: &Vec<Member>, file_path: &String){
 
     for fm in flat_class_list {
         match fm {
-            Member::Class(class) => {
+            Member::Type(class) => {
                 let _ =writeln!(output, "{}", class.name);
                 for cm in class.member {
                     match cm {
@@ -373,6 +451,7 @@ fn main() {
     let _ = input.read_to_string(&mut text);
     let tokens = tokenize(text);
     let members = parse_file(&tokens);
+    print!("{:#?}", &members);
 
     export(&members, &format!("{}.csv", &file_path));
 }
