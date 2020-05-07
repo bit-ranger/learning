@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{ErrorKind, Read};
+use std::io::{ErrorKind, Read, Write};
 use std::env;
 
 #[derive(Debug,Clone)]
@@ -80,7 +80,7 @@ fn parse_body(tokens: &Vec<String>) -> Vec<Member> {
         }
         if t.starts_with("/*") {
             let right_index = i + tokens[i..].iter().position(|e| e.ends_with("*/")).unwrap();
-            comment.push(tokens[i..right_index + 1].join(""));
+            comment.extend(parse_doc_comment(tokens[i..right_index + 1].to_vec().as_ref()));
             meta_left = right_index + 1;
             continue;
         }
@@ -157,7 +157,7 @@ fn parse_file(tokens: &Vec<String>) -> Vec<Member> {
         }
         if comment_enable && t.starts_with("/*") {
             let right_index = i + tokens[i..].iter().position(|e| e.ends_with("*/")).unwrap();
-            comment.push(tokens[i..right_index + 1].join(""));
+            comment.extend(parse_doc_comment(tokens[i..right_index + 1].to_vec().as_ref()));
             meta_left = right_index + 1;
             continue;
         }
@@ -191,10 +191,6 @@ fn parse_file(tokens: &Vec<String>) -> Vec<Member> {
     return member_list;
 }
 
-// fn meta_left_index(tokens: &Vec<String>, meta_right_index: usize) -> usize{
-//     return tokens[..meta_right_index].iter().rposition(|e|  e.eq(";")).unwrap()+1;
-// }
-
 fn parse_class_meta(meta: &Vec<String>) -> Class {
     let implements_index = meta.iter().position(|e| e.eq("implements"));
     let extends_index = meta.iter().position(|e| e.eq("extends"));
@@ -210,11 +206,6 @@ fn parse_class_meta(meta: &Vec<String>) -> Class {
         comment: Vec::with_capacity(0),
     };
 }
-
-/**
-public String getString(String a, int b){
-
-*/
 
 fn parse_method_meta(meta: &Vec<String>) -> Method {
     let left_bracket_index = meta.iter().position(|e| e.eq("(")).unwrap();
@@ -265,6 +256,10 @@ fn parse_field_meta(meta: &Vec<String>) -> Field {
     };
 }
 
+fn parse_doc_comment(comments: &Vec<String>) -> Vec<String> {
+    return comments.to_vec();
+}
+
 fn match_right(tokens: &Vec<String>, left_index: usize, right_token: &String) -> usize {
     let left_token = tokens.get(left_index).unwrap();
     let mut entrant = 0;
@@ -301,12 +296,72 @@ fn to_flat_class(members:&Vec<Member>, flat_class_container:&mut Vec<Member>){
     }
 }
 
+fn export_comment(comments: &Vec<String>) -> String{
+    if comments.len() < 2{
+        return String::new();
+    }
+    let comments:Vec<String> = comments[1..comments.len()-1].to_vec();
+    let mut new:Vec<String> = Vec::new();
+    let mut line_buffer: Vec<String> = Vec::new();
+    for (i,e) in comments.iter().enumerate() {
+        if e.eq("\r"){
+            continue;
+        }
+        if e.eq("\n") || i == comments.len()-1{
+            let star_pos =  line_buffer.iter().position(|e| e.eq("*"));
+            match star_pos{
+                None => new.push(line_buffer.join("")),
+                Some(star_pos) => {
+                    let any_before_star = line_buffer[..star_pos].iter().find(|e| !e.trim().is_empty());
+                    match any_before_star{
+                        None => new.push(line_buffer[star_pos +1..].join("")),
+                        Some(_) => {line_buffer.join("");}
+                    }
+                }
+            }
+
+            line_buffer.clear();
+        } else{
+            line_buffer.push(e.clone());
+        }
+    }
+    return new.join("");
+}
+
+fn export(members: &Vec<Member>, file_path: &String){
+    let mut flat_class_list:Vec<Member> = Vec::new();
+    to_flat_class(members, &mut flat_class_list);
+
+    let output = File::create(file_path);
+    let mut output = match output {
+        Ok(file) => file,
+        Err(error) => panic!("There was a problem creating the file: {:?}", error)
+    };
+
+    for fm in flat_class_list {
+        match fm {
+            Member::Class(class) => {
+                let _ =writeln!(output, "{}", class.name);
+                for cm in class.member {
+                    match cm {
+                        Member::Field(field) => {
+                            let _ = writeln!(output, "{}", [field.name, field.data_type, export_comment(field.comment.as_ref())].join(","));
+                        },
+                        _ => continue
+                    }
+                }
+            },
+            _ => continue
+        }
+    }
+}
+
 fn main() {
     let file_path = env::args()
         .nth(1)
         .expect("require file_path");
-    let f = File::open(file_path);
-    let mut f = match f {
+    let input = File::open(&file_path);
+    let mut input = match input {
         Ok(file) => file,
         Err(error) => match error.kind() {
             ErrorKind::NotFound => panic!("File not found"),
@@ -315,13 +370,9 @@ fn main() {
     };
 
     let mut text = String::new();
-    let _ = f.read_to_string(&mut text);
+    let _ = input.read_to_string(&mut text);
     let tokens = tokenize(text);
     let members = parse_file(&tokens);
 
-
-    let mut flat_member_container:Vec<Member> = Vec::new();
-    to_flat_class(&members, &mut flat_member_container);
-
-    print!("{:#?}", flat_member_container);
+    export(&members, &format!("{}.csv", &file_path));
 }
