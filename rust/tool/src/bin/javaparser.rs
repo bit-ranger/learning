@@ -247,15 +247,6 @@ fn is_method_meta(meta: &Vec<String>) -> bool{
 fn parse_method_meta(meta: &Vec<String>) -> Method {
     let left_bracket_index = meta.iter().position(|e| e.eq("(")).unwrap();
     let name_index = left_bracket_index - 1;
-    // let mut return_type_index =
-    //     if left_bracket_index > 1 {
-    //         name_index - 1
-    //     } else {
-    //         name_index
-    //     };
-    // if  {
-    //     return_type_index = name_index;
-    // }
     let qualifier_list = ["public", "private", "protected", "static"];
     let last_qualifier_index = meta[..name_index]
         .iter()
