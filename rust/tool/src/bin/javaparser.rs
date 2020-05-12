@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{ErrorKind, Read, Write};
 use std::env;
+use std::path::Path;
 
 #[derive(Debug,Clone)]
 struct Type {
@@ -409,23 +410,30 @@ fn export(members: &Vec<Member>, file_path: &String){
 }
 
 fn main() {
-    let file_path = env::args()
-        .nth(1)
-        .expect("require file_path");
-    let input = File::open(&file_path);
-    let mut input = match input {
-        Ok(file) => file,
-        Err(error) => match error.kind() {
-            ErrorKind::NotFound => panic!("File not found"),
-            other_error => panic!("There was a problem opening the file: {:?}", other_error),
-        },
-    };
+    let mut args = env::args();
+    let export_file_path =
+        args.nth(1)
+        .expect("require export_file_path");
 
-    let mut text = String::new();
-    let _ = input.read_to_string(&mut text);
-    let tokens = tokenize(text);
-    let members = parse_file(&tokens);
-    print!("{:#?}", &members);
+    for arg in args {
+        let path = Path::new(&arg);
+        let file = File::open(&path);
+        let mut input = match file {
+            Ok(f) => f,
+            Err(error) => match error.kind() {
+                ErrorKind::NotFound => panic!("File not found"),
+                other_error => panic!("There was a problem opening the file: {:?}", other_error),
+            },
+        };
 
-    export(&members, &format!("{}.csv", &file_path));
+        let mut text = String::new();
+        let _ = input.read_to_string(&mut text);
+        let tokens = tokenize(text);
+        let members = parse_file(&tokens);
+        print!("{:#?}", &members);
+
+        export(&members, &format!("{}{}{}.csv", export_file_path, std::path::MAIN_SEPARATOR, path.file_name().unwrap().to_str().unwrap()));
+    }
+
+
 }
