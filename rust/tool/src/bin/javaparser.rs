@@ -390,7 +390,8 @@ fn export(members: &Vec<Member>, file_path: &String){
         Ok(file) => file,
         Err(error) => panic!("There was a problem creating the file: {:?}", error)
     };
-
+    //utf-8 bom
+    let _ =output.write("\u{feff}".as_bytes());
     for fm in flat_class_list {
         match fm {
             Member::Type(class) => {
