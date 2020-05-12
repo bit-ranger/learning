@@ -411,13 +411,24 @@ fn export(members: &Vec<Member>, file_path: &String){
 }
 
 fn main() {
-    let mut args = env::args();
-    let export_file_path =
-        args.nth(1)
-        .expect("require export_file_path");
+    let args: Vec<_> = env::args().collect();
+    let program = args[0].clone();
+    let mut opts = getopts::Options::new();
+    opts.optopt("o", "output", "output dir", "output dir");
 
-    for arg in args {
-        let path = Path::new(&arg);
+    let matches = match opts.parse(&args[1..]) {
+        Ok(m) => m,
+        Err(_) => {
+            println!("{}", opts.short_usage(&program));
+            return;
+        }
+    };
+
+    let output_file_path = matches.opt_str("o");
+    let source_files = matches.free;
+
+    for src in source_files {
+        let path = Path::new(&src);
         let file = File::open(&path);
         let mut input = match file {
             Ok(f) => f,
@@ -433,8 +444,12 @@ fn main() {
         let members = parse_file(&tokens);
         print!("{:#?}", &members);
 
-        export(&members, &format!("{}{}{}.csv", export_file_path, std::path::MAIN_SEPARATOR, path.file_name().unwrap().to_str().unwrap()));
-    }
 
+        match &output_file_path{
+            Some(of) => export(&members, &format!("{}{}{}.csv", of, std::path::MAIN_SEPARATOR, path.file_name().unwrap().to_str().unwrap())),
+            None => export(&members, &format!("{}.csv", src))
+        }
+
+    }
 
 }
