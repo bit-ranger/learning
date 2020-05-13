@@ -357,6 +357,7 @@ fn export_comment(comments: &Vec<String>) -> String{
     let mut new:Vec<String> = Vec::new();
     let mut line_buffer: Vec<String> = Vec::new();
     for (i,e) in comments.iter().enumerate() {
+        line_buffer.push(e.clone());
         if e.eq("\r"){
             continue;
         }
@@ -372,13 +373,10 @@ fn export_comment(comments: &Vec<String>) -> String{
                     }
                 }
             }
-
             line_buffer.clear();
-        } else{
-            line_buffer.push(e.clone());
         }
     }
-    return new.join("\r\n");
+    return new.join("");
 }
 
 fn export(members: &Vec<Member>, file_path: &String){
