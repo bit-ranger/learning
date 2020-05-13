@@ -378,7 +378,7 @@ fn export_comment(comments: &Vec<String>) -> String{
             line_buffer.push(e.clone());
         }
     }
-    return new.join("");
+    return new.join("\r\n");
 }
 
 fn export(members: &Vec<Member>, file_path: &String){
@@ -399,7 +399,7 @@ fn export(members: &Vec<Member>, file_path: &String){
                 for cm in class.member {
                     match cm {
                         Member::Field(field) => {
-                            let _ = writeln!(output, "{}", [field.name, field.data_type, export_comment(field.comment.as_ref())].join(","));
+                            let _ = writeln!(output, "{},{},\"{}\"", field.name, field.data_type, export_comment(field.comment.as_ref()));
                         },
                         _ => continue
                     }
