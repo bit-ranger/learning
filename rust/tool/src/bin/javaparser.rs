@@ -295,15 +295,21 @@ fn parse_method_meta(meta: &Vec<String>) -> Method {
 }
 
 fn parse_field_meta(meta: &Vec<String>) -> Field {
-    let eq_index = meta.iter().position(|e| e.eq("="));
-    let define = match eq_index {
-        Some(index) => meta[..index].to_vec(),
+    let eq_idx = meta.iter().position(|e| e.eq("="));
+    let define = match eq_idx {
+        Some(idx) => meta[..idx].to_vec(),
         None => meta.to_vec()
     };
+    let lt_idx = define.iter().position(|e| e.eq("<"));
+    let data_type_idx = match lt_idx {
+        Some(idx) => idx-1,
+        None => define.len()-2
+    };
+
     return Field {
         name: define[define.len() - 1].clone(),
-        data_type: define[define.len() - 2].clone(),
-        qualifier: define[..define.len() - 2].to_vec(),
+        data_type: define[data_type_idx..define.len() - 1].join(""),
+        qualifier: define[..data_type_idx].to_vec(),
         annotation: Vec::with_capacity(0),
         comment: Vec::with_capacity(0),
     };
