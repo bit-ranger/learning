@@ -32,12 +32,14 @@ members = [
 'advanced_macro_pancakes',
 'webserver_demo',
 'async_demo',
-'tax2019',
+'tool/tax2019',
 'diesel_demo',
 'serialize',
 #"ffi/fromc",
 #"ffi/toc",
-'tool'
+'tool/javaparser',
+'tool/tax2019',
+'tool/hmby'
 ]
 
 
