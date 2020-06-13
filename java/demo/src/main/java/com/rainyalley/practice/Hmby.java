@@ -84,12 +84,11 @@ public class Hmby {
             String ability = jo.getString("ability");
             String[] split = StringUtils.split(ability, ",");
             String na = Stream.of(split).mapToInt(Integer::valueOf).map(i -> {
+                int range = i-80;
                 if(i >= 80){
-                    int range = i-80;
-                    return Math.min(200, (int)(80 + Math.pow(1.04, range) * range));
-                } else {
-                    int range = 80-i;
-                    return Math.max(1, (int)(80 - Math.pow(1.04, range) * range));
+                    return Math.min(200, (int)(80 * Math.pow(1.03, range)));
+                } else{
+                    return Math.max(1, (int)(80 * Math.pow(1.03, range)));
                 }
             }).mapToObj(String::valueOf).collect(Collectors.joining(","));
             jo.put("ability", na);
