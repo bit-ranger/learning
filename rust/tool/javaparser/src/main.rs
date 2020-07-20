@@ -114,7 +114,14 @@ fn parse_type(tokens: &Vec<String>) -> Vec<Member> {
                 method.annotation = annotation.clone();
                 method.comment = comment.clone();
                 member_list.push(Member::Method(method));
-            } else {
+            }
+            else if is_field_meta(&meta){
+                let mut field = parse_field_meta(&meta);
+                field.annotation = annotation.clone();
+                field.comment = comment.clone();
+                member_list.push(Member::Field(field));
+            }
+            else {
                 let mut type_ = parse_type_meta(&meta);
                 let class_member = parse_type(&tokens[i + 1..right_index + 1].to_vec());
                 type_.annotation = annotation.clone();
@@ -129,18 +136,21 @@ fn parse_type(tokens: &Vec<String>) -> Vec<Member> {
         }
         if t.eq(";") {
             let meta = trim_and_remove_empty(tokens[meta_left..i].to_vec());
-            if is_method_meta(&meta){
-                let mut method = parse_method_meta(&meta);
-                method.is_abstract = true;
-                method.annotation = annotation.clone();
-                method.comment = comment.clone();
-                member_list.push(Member::Method(method));
-            } else{
-                let mut field = parse_field_meta(&meta);
-                field.annotation = annotation.clone();
-                field.comment = comment.clone();
-                member_list.push(Member::Field(field));
+            if !meta.is_empty() {
+                if is_method_meta(&meta){
+                    let mut method = parse_method_meta(&meta);
+                    method.is_abstract = true;
+                    method.annotation = annotation.clone();
+                    method.comment = comment.clone();
+                    member_list.push(Member::Method(method));
+                } else{
+                    let mut field = parse_field_meta(&meta);
+                    field.annotation = annotation.clone();
+                    field.comment = comment.clone();
+                    member_list.push(Member::Field(field));
+                }
             }
+
             annotation.clear();
             comment.clear();
             meta_left = i + 1;
@@ -245,6 +255,10 @@ fn is_method_meta(meta: &Vec<String>) -> bool{
     return  meta.iter().position(|e| e.eq("(")).is_some()
 }
 
+fn is_field_meta(meta: &Vec<String>) -> bool{
+    return  meta.iter().position(|e| e.eq("=")).is_some()
+}
+
 fn parse_method_meta(meta: &Vec<String>) -> Method {
     let left_bracket_index = meta.iter().position(|e| e.eq("(")).unwrap();
     let name_index = left_bracket_index - 1;
@@ -261,7 +275,7 @@ fn parse_method_meta(meta: &Vec<String>) -> Method {
             let mut it = Vec::new();
             let mut last_it_push_idx = left_bracket_index;
             for (i, e) in meta.iter().enumerate() {
-                if e.eq(",") || i == meta.len() - 1 {
+                if (i > left_bracket_index && e.eq(",")) || i == meta.len() - 1 {
                     it.push(meta[last_it_push_idx+1 .. i-1].join(""));
                     last_it_push_idx = i;
                 }
