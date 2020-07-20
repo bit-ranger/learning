@@ -2,8 +2,6 @@
 
 set -e
 
-docker build -t rust-crossbuild .
-
 # Use -u so the resulting binaries are owned by the host user
 
 # linux
