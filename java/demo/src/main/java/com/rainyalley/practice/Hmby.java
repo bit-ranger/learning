@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
@@ -33,73 +34,73 @@ import java.util.stream.Stream;
 public class Hmby {
 
 
-//    public static String jsonToXML(String json) {
-//
-//        XMLSerializer xmlSerializer = new XMLSerializer();
-//
-//// 根节点名称
-//
-//        xmlSerializer.setRootName("xml");
-//
-//// 不对类型进行设置
-//
-//        xmlSerializer.setTypeHintsEnabled(false);
-//
-//        String xmlStr = "";
-//
-//        if (json.contains("[") && json.contains("]")) {
-//
-//// jsonArray
-//
-//            JSONArray jobj = JSONArray.fromObject(json);
-//
-//            xmlStr = xmlSerializer.write(jobj);
-//
-//        } else {
-//
-//// jsonObject
-//
-//            JSONObject jobj = JSONObject.fromObject(json);
-//
-//            xmlStr = xmlSerializer.write(jobj);
-//
-//        }
-//
-//        return xmlStr;
-
-//    }
-
     public static void main(String[] args) throws Exception{
+        Hmby hmby = new Hmby();
+        hmby.compute();
+    }
+
+    private void compute() throws Exception{
         InputStream is = new FileInputStream(new File(
-                "C:\\Users\\Administrator\\Downloads\\hmby\\generalinfo.xml"));
+                "C:\\Users\\bitranger\\Downloads\\hmby\\generalinfo.xml"));
         String xml = IOUtils.toString(is);
         XMLSerializer xmlSerializer = new XMLSerializer();
         JSONArray json = (JSONArray)xmlSerializer.read(xml);
 
         for (Object o : json) {
             JSONObject jo = (JSONObject) o;
-            if (!jo.containsKey("ability")){
-                continue;
-            }
-            String ability = jo.getString("ability");
-            String[] split = StringUtils.split(ability, ",");
-            String na = Stream.of(split).mapToInt(Integer::valueOf).map(i -> {
-                int range = i-80;
-                if(i >= 80){
-                    return Math.min(200, (int)(80 * Math.pow(1.03, range)));
-                } else{
-                    return Math.max(1, (int)(80 * Math.pow(1.03, range)));
-                }
-            }).mapToObj(String::valueOf).collect(Collectors.joining(","));
-            jo.put("ability", na);
+//            ablity(jo);
+            cof(jo);
         }
 
         FileWriter writer = new FileWriter(new File(
-                "C:\\Users\\Administrator\\Downloads\\hmby\\generalinfo_out.xml"));
+                "C:\\Users\\bitranger\\Downloads\\hmby\\generalinfo_out.xml"));
 
         toXml(json, writer, "general");
         writer.close();
     }
+
+    private void ablity(JSONObject jo){
+
+        if (!jo.containsKey("ability")){
+            return;
+        }
+        String ability = jo.getString("ability");
+        String[] split = StringUtils.split(ability, ",");
+        String na = Stream.of(split).mapToInt(Integer::valueOf).map(i -> {
+            int range = i-80;
+            if(i >= 80){
+                return Math.min(200, (int)(80 * Math.pow(1.03, range)));
+            } else{
+                return Math.max(1, (int)(80 * Math.pow(1.03, range)));
+            }
+        }).mapToObj(String::valueOf).collect(Collectors.joining(","));
+        jo.put("ability", na);
+    }
+
+    private  void cof(JSONObject jo){
+        if (!jo.containsKey("cof")){
+            return;
+        }
+        JSONObject cof = jo.getJSONObject("cof");
+
+        if(!cof.containsKey("#text")){
+            return;
+        }
+
+        String[] split = StringUtils.split(cof.getString("#text"), ",");
+
+        String na = IntStream.range(0, split.length)
+                .mapToObj(i -> {
+                    if(i % 2 == 0){
+                        return split[i];
+                    }else{
+                        return String.valueOf(Integer.parseInt(split[i]) * 4);
+                    }
+                })
+                .collect(Collectors.joining(","));
+        cof.put("#text", na);
+    }
+
 
     private static void toXml(JSONArray json, Writer writer, String nodeName) throws IOException {
         for (Object o : json) {
