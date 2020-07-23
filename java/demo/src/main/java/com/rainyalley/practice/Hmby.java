@@ -94,7 +94,7 @@ public class Hmby {
                     if(i % 2 == 0){
                         return split[i];
                     }else{
-                        return String.valueOf(Integer.parseInt(split[i]) * 4);
+                        return String.valueOf(Integer.parseInt(split[i]) * 2);
                     }
                 })
                 .collect(Collectors.joining(","));
