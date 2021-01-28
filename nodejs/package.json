@@ -8,7 +8,7 @@
     "url": "https://github.com/dubuyuye/learning-nodejs"
   },
   "dependencies": {
-    "mongodb": "~2.0",
+    "mongodb": "~3.6",
 	"formidable": "1.0.17"
   },
   "author": "dubuyuye",
