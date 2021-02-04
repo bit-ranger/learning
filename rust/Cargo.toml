@@ -36,7 +36,8 @@ members = [
 #'demo/diesel_demo',
 #'demo/serialize',
 'tool/javaparser',
-'tool/hmby'
+'tool/hmby',
+    'tool/sqlgen_code_name'
 ]
 
 
