@@ -22,7 +22,7 @@ members = [
 #'demo/refcycle',
 #'demo/concurrency',
 #'demo/gui',
-#'demo/blog',
+'demo/blog',
 #'demo/blog2',
 #'demo/pattern',
 #'demo/advanced_unsafe',
