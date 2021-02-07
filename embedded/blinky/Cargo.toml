@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 # Gives us access to the STM32F1 registers
-stm32f1 = {version = "0.6.0", features = ["stm32f103", "rt"]}
+#stm32f1 = {version = "0.6.0", features = ["stm32f103", "rt"]}
 # provides startup code for the ARM CPU
 cortex-m-rt = "0.6.7"
 # provides access to low level ARM CPU registers (used for delay)
@@ -17,4 +17,6 @@ cortex-m = "0.5.8"
 # (required when not using stdlib)
 panic-halt = "0.2.0"
 
+embedded-hal = "0.2.4"
+stm32f1xx-hal = {version = "0.7.0", features = ["rt", "stm32f103", "medium"]}
 

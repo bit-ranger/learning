@@ -1,33 +1,43 @@
-// std and main are not available for bare metal software
 #![no_std]
 #![no_main]
 
-extern crate stm32f1;
 extern crate panic_halt;
-extern crate cortex_m_rt;
+extern crate stm32f1xx_hal as hal;
 
+use cortex_m::asm;
 use cortex_m_rt::entry;
-use stm32f1::stm32f103;
+use hal::prelude::*;
+use embedded_hal::digital::v2::OutputPin;
 
-// use `main` as the entry point of this application
 #[entry]
 fn main() -> ! {
-    // get handles to the hardware
-    let peripherals = stm32f103::Peripherals::take().unwrap();
-    let gpioc = &peripherals.GPIOC;
-    let rcc = &peripherals.RCC;
+    // 获取 Peripherals
+    let peripherals = hal::pac::Peripherals::take().unwrap();
 
-    // enable the GPIO clock for IO port C
-    rcc.apb2enr.write(|w| w.iopcen().set_bit());
-    gpioc.crh.write(|w| unsafe{
-        w.mode13().bits(0b11);
-        w.cnf13().bits(0b00)
-    });
+    // 将 RCC 寄存器结构体转换为进一步抽象的 hal 结构体
+    let mut rcc = peripherals.RCC.constrain();
 
-    loop{
-        gpioc.bsrr.write(|w| w.bs13().set_bit());
-        cortex_m::asm::delay(2000000);
-        gpioc.brr.write(|w| w.br13().set_bit());
-        cortex_m::asm::delay(2000000);
+    // 获取 GPIOC 实例，这里会自动打开总线开关
+    let mut gpio_c = peripherals.GPIOC.split(&mut rcc.apb2);
+
+    // 获取 PC13 实例，并进行引脚配置
+    let mut led = gpio_c.pc13.into_push_pull_output(&mut gpio_c.crh);
+
+    //https://pic3.zhimg.com/80/v2-6165f61bc28c9e94b23d44cee04b0e2a_720w.jpg
+    loop {
+        delay();
+
+        // 输出低电平
+        let _ =led.set_low();
+
+        delay();
+
+
+        // 输出高电平
+        let _ = led.set_high();
     }
+}
+
+fn delay() {
+    let _ = asm::delay(2000000);
 }
