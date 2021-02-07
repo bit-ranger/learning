@@ -7,6 +7,14 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cortex-m = "0.5.8"        # cortex-m 核心指令集
-cortex-m-rt = "0.6.5"     # 最小运行时，负责启动内存初始化
-panic-halt = "0.2.0"      # 定义发生 panic 时采取立即停机的行为
+# Gives us access to the STM32F1 registers
+stm32f1 = {version = "0.6.0", features = ["stm32f103", "rt"]}
+# provides startup code for the ARM CPU
+cortex-m-rt = "0.6.7"
+# provides access to low level ARM CPU registers (used for delay)
+cortex-m = "0.5.8"
+# provies a panic-handler (halting cpu)
+# (required when not using stdlib)
+panic-halt = "0.2.0"
+
+
