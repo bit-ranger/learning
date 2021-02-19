@@ -1,0 +1,12 @@
+[package]
+name = "sqlgen_simple_dml"
+version = "0.1.0"
+authors = ["bit-ranger <sincerebravefight@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+csv = "1.1.5"
+strfmt = "0.1.6"
+getopts = "0.2.21"
