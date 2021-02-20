@@ -24,6 +24,7 @@ members = [
     #'demo/gui',
     'demo/blog',
     'demo/amap',
+    'demo/qqmap',
     #'demo/blog2',
     #'demo/pattern',
     #'demo/advanced_unsafe',
